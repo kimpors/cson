@@ -11,9 +11,13 @@ void print_tok(Token *tok)
 			puts("type: bracket");
 			printf("value: %c\n", (char)(long)tok->value);
 			break;
-		case NAME:
-			puts("type: name");
-			printf("value: %s\n", (char *)tok->value);
+		case SEPARATOR:
+			puts("type: separator");
+			printf("value: %c\n", (char)(long)tok->value);
+			break;
+		case COMA:
+			puts("type: coma");
+			printf("value: %c\n", (char)(long)tok->value);
 			break;
 		case STRING:
 			puts("type: string");
@@ -23,9 +27,13 @@ void print_tok(Token *tok)
 			puts("type: number");
 			printf("value: %lf\n", *(double *)tok->value);
 			break;
-		case ARRAY:
-			puts("type: array");
-			printf("value: %s\n", (char *)tok->value);
+		case BOOL:
+			puts("type: bool");
+			printf("value: %s\n", (long)tok->value > 0 ? "true" : "false");
+			break;
+		case NIL:
+			puts("type: nil");
+			printf("value: null\n");
 			break;
 		default:
 			break;
@@ -34,16 +42,6 @@ void print_tok(Token *tok)
 
 Token *push(TokenType type, void *value);
 
-Item *getarray(char *s, size_t lim)
-{
-	printf("%s\n", s);
-	while (lim-- > 0 && *s)
-	{
-		printf("%c", *s++);
-	}
-	return NULL;
-}
-
 char *gettoken(char *s, Token *dest, size_t lim)
 {
 	if (!s || !*s) return NULL;
@@ -51,60 +49,67 @@ char *gettoken(char *s, Token *dest, size_t lim)
 
 	char *ps = s;
 
-	if (*s == '{' || *s == '}')
+	if (*s == '{' || *s == '}' ||
+		*s == '[' || *s == ']')
 	{
 		dest->type = BRACKET;
 		dest->value = (void *)(long)*s;
 		s++;
 	}
-	else if (*s == ':' && (s++))
+	else if (*s == ':')
 	{
-		if (isdigit(*s))
-		{
-			ps = s;
-			while (isdigit(*++ps));
+		dest->type = SEPARATOR;
+		dest->value = (void *)(long)*s;
+		s++;
+	}
+	else if (*s == ',')
+	{
+		dest->type = COMA;
+		dest->value = (void *)(long)*s;
+		s++;
+	}
+	else if (isdigit(*s))
+	{
+		ps = s;
+		while (isdigit(*++ps));
 
-			int c = *ps;
-			*ps = '\0';
+		int c = *ps;
+		*ps = '\0';
 
-			dest->type = NUMBER;
-			dest->value = malloc(sizeof(double));
-			*((double *)dest->value) = atof(s);
+		dest->type = NUMBER;
+		dest->value = malloc(sizeof(double));
+		*((double *)dest->value) = atof(s);
 
-			*ps = c;
-			s = ps;
-		}
-		else if (*s == '"' && s++)
-		{
-			ps = s;
-			while ((*ps != '\0') && *++ps != '"');
-
-			dest->type = STRING;
-			dest->value = malloc(ps - s);
-			strncpy(dest->value, s, ps - s);
-			s = ps + 1;
-		}
-		else if (*s == '[' && s++)
-		{
-			ps = s;
-			while (*ps != '\0' && *++ps != ']');
-
-			dest->type = ARRAY;
-			dest->value = malloc(ps - s);
-			strncpy(dest->value, s, ps - s);
-			((char *)dest->value)[ps - s] = '\0';
-			s = ps + 1;
-		}
+		*ps = c;
+		s = ps;
 	}
 	else if (*s == '"' && s++)
 	{
 		ps = s;
 		while (*ps != '\0' && *++ps != '"');
 
-		dest->type = NAME;
+		dest->type = STRING;
 		dest->value = malloc(ps - s);
 		strncpy(dest->value, s, ps - s);
 		s = ps + 1;
+	}
+	else if (!strncmp(s, "null", 4))
+	{
+		dest->type = NIL;
+		dest->value = NULL;
+		s += 5;
+	}
+	else if (!strncmp(s, "true", 4))
+	{
+		dest->type = BOOL;
+		dest->value = (void *)true;
+		s += 5;
+	}
+	else if (!strncmp(s, "false", 5))
+	{
+		dest->type = BOOL;
+		dest->value = false;
+		s += 6;
 	}
 	else
 	{

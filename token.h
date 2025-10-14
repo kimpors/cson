@@ -3,20 +3,10 @@
 #include <stdbool.h>
 
 typedef enum {
-	// types
-	BRACKET, NAME,
-
-	// value types
-	NONE, NUMBER, STRING,
-	BOOL, ARRAY, OBJECT,
-	NIL
+	NONE, BRACKET, COMA,
+	SEPARATOR, NUMBER,
+	STRING, BOOL, NIL
 } TokenType;
-
-// for array type
-typedef struct {
-	TokenType type;
-	void *value;
-} Item;
 
 typedef struct {
 	void *value;
