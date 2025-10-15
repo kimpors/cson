@@ -5,7 +5,7 @@
 #define MAX_FILE_SIZE 1024
 
 static FILE *fp;
-static char buf[MAX_FILE_SIZE] = "{\"name\":34}";
+static char buf[MAX_FILE_SIZE] = "{\"name\":\"John\", \"age\":12}";
 
 int main(int argc, char *argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 		exit(2);
 	}
 
-	Token tok;
+	JToken tok;
 	char *ps = buf;
 	while ((ps = gettoken(ps, &tok, MAX_FILE_SIZE)))
 	{
