@@ -1,6 +1,11 @@
 #pragma once
 #include "token.h"
 
+#define JNIL(A) (long)(A)
+#define JBOO(A) (bool)(A)
+#define JSTR(A) (char *)(A)
+#define JNUM(A)	*((double *)(A))  
+
 typedef enum {
 	NIL, STRING, 
 	NUMBER, BOOL,

@@ -13,19 +13,19 @@ void print_item(JItem *item)
 	{
         case NIL:
 			puts("type: nil");
-			printf("value: %ld\n", (long)item->value);
+			printf("value: %ld\n", JNIL(item->value));
 			break;
         case STRING:
 			puts("type: string");
-			printf("value: %s\n", (char *)item->value);
+			printf("value: %s\n", JSTR(item->value));
 			break;
         case NUMBER:
 			puts("type: number");
-			printf("value: %lf\n", *((double *)item->value));
+			printf("value: %lf\n", JNUM(item->value));
 			break;
         case BOOL:
 			puts("type: bool");
-			printf("value: %s\n", !(bool)item->value ? "false" : "true");
+			printf("value: %s\n", !JBOO(item->value) ? "false" : "true");
 			break;
 		default:
           break;
