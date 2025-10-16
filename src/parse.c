@@ -5,32 +5,31 @@
 #include "parse.h"
 #include "token.h"
 
-void print_value(JValue *val)
+void print_value(JValue *arr)
 {
-	switch (val->type) 
+	switch (arr->type) 
 	{
         case NIL:
 			puts("type: nil");
-			printf("value: %ld\n", JNIL(val->value));
 			break;
         case STRING:
 			puts("type: string");
-			printf("value: %s\n", JSTR(val->value));
+			printf("value: %s\n", arr->value.str);
 			break;
         case NUMBER:
 			puts("type: number");
-			printf("value: %lf\n", JNUM(val->value));
+			printf("value: %lf\n", arr->value.num);
 			break;
         case BOOL:
 			puts("type: bool");
-			printf("value: %s\n", !JBOO(val->value) ? "false" : "true");
+			printf("value: %s\n", !arr->value.boo ? "false" : "true");
 			break;
 		case OBJECT:
 			puts("type: object");
 			puts("object begin");
 			for (size_t i = 0; i < 2; i++)
 			{
-				print_item(&((JItem *)val->value)[i]);
+				print_item(&arr->value.obj[i]);
 			}
 			puts("object end");
 			break;
@@ -39,41 +38,40 @@ void print_value(JValue *val)
 			puts("array begin");
 			for (size_t i = 0; i < 2; i++)
 			{
-				print_value(&((JValue *)val->value)[i]);
+				print_value(&arr->value.arr[i]);
 			}
 			puts("array end");
 			break;
     }
 }
 
-void print_item(JItem *item)
+void print_item(JItem *obj)
 {
-	printf("key: %s\n", item->key);
+	printf("key: %s\n", obj->key);
 
-	switch (item->type) 
+	switch (obj->type) 
 	{
         case NIL:
 			puts("type: nil");
-			printf("value: %ld\n", JNIL(item->value));
 			break;
         case STRING:
 			puts("type: string");
-			printf("value: %s\n", JSTR(item->value));
+			printf("value: %s\n", obj->value.str);
 			break;
         case NUMBER:
 			puts("type: number");
-			printf("value: %lf\n", JNUM(item->value));
+			printf("value: %lf\n", obj->value.num);
 			break;
         case BOOL:
 			puts("type: bool");
-			printf("value: %s\n", !JBOO(item->value) ? "false" : "true");
+			printf("value: %s\n", !obj->value.boo ? "false" : "true");
 			break;
 		case OBJECT:
 			puts("type: object");
 			puts("object begin");
 			for (size_t i = 0; i < 2; i++)
 			{
-				print_item(&((JItem *)item->value)[i]);
+				print_item( &obj->value.obj[i]);
 			}
 			puts("object end");
 			break;
@@ -82,7 +80,7 @@ void print_item(JItem *item)
 			puts("array begin");
 			for (size_t i = 0; i < 6; i++)
 			{
-				print_value(&((JValue *)item->value)[i]);
+				print_value(&obj->value.arr[i]);
 			}
 			puts("array end");
 			break;
@@ -116,7 +114,7 @@ JValue *parse_array(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = OBJECT;
-					buf[j].value = (void *)parse(toks + i, temp - i);
+					buf[j].value.obj = parse(toks + i, temp - i);
 					i = temp;
 				}
 				else if (*toks[i].value == '[')
@@ -131,7 +129,7 @@ JValue *parse_array(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = ARRAY;
-					buf[j].value = (void *)parse_array(toks + i, temp - i);
+					buf[j].value.arr = parse_array(toks + i, temp - i);
 					i = temp;
 				}
 				break;
@@ -139,29 +137,27 @@ JValue *parse_array(JToken *toks, size_t lim)
 					if (*toks[i].value == '"')
 					{
 						buf[j].type = STRING;
-						buf[j].value = toks[i].value + 1;
+						buf[j].value.str = toks[i].value + 1;
 					}
 					else if (isdigit(*toks[i].value))
 					{
 						buf[j].type = NUMBER;
-						double *temp = malloc(sizeof(double));
-						*temp = atof(toks[i].value);
-						buf[j].value = (void *)temp;
+						buf[j].value.num = atof(toks[i].value);
 					}
 					else if (!strncmp(toks[i].value, "null", 4))
 					{
 						buf[j].type = NIL;
-						buf[j].value = NULL;
+						buf[j].value.boo = NULL;
 					}
 					else if (!strncmp(toks[i].value, "true", 4))
 					{
 						buf[j].type = BOOL;
-						buf[j].value = (void *)true;
+						buf[j].value.boo = true;
 					}
 					else if (!strncmp(toks[i].value, "false", 5))
 					{
 						buf[j].type = BOOL;
-						buf[j].value = (void *)false;
+						buf[j].value.boo = false;
 					}
 				break;
 			default:
@@ -197,7 +193,7 @@ JItem *parse(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = OBJECT;
-					buf[j].value = (void *)parse(toks + i, temp - i);
+					buf[j].value.obj = parse(toks + i, temp - i);
 					i = temp;
 					break;
 				case '[':
@@ -211,7 +207,7 @@ JItem *parse(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = ARRAY;
-					buf[j].value = (void *)parse_array(toks + i, temp - i);
+					buf[j].value.arr = parse_array(toks + i, temp - i);
 					i = temp;
 					break;
 			}
@@ -235,30 +231,27 @@ JItem *parse(JToken *toks, size_t lim)
 			if (*toks[i].value == '"')
 			{
 				buf[j].type = STRING;
-				buf[j].value = toks[i].value + 1;
+				buf[j].value.str = toks[i].value + 1;
 			}
 			else if (isdigit(*toks[i].value))
 			{
 				buf[j].type = NUMBER;
-				double *temp = malloc(sizeof(double));
-				*temp = atof(toks[i].value);
-				buf[j].value = (void *)temp;
+				buf[j].value.num = atof(toks[i].value);
 			}
 			else if (!strncmp(toks[i].value, "null", 4))
 			{
 				buf[j].type = NIL;
-				buf[j].value = NULL;
-
+				buf[j].value.boo = NULL;
 			}
 			else if (!strncmp(toks[i].value, "true", 4))
 			{
 				buf[j].type = BOOL;
-				buf[j].value = (void *)true;
+				buf[j].value.boo = true;
 			}
 			else if (!strncmp(toks[i].value, "false", 5))
 			{
 				buf[j].type = BOOL;
-				buf[j].value = (void *)false;
+				buf[j].value.boo = false;
 			}
 
 			issep = false;

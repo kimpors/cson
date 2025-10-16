@@ -1,10 +1,6 @@
 #pragma once
 #include "token.h"
-
-#define JNIL(A) (long)(A)
-#define JBOO(A) (bool)(A)
-#define JSTR(A) (char *)(A)
-#define JNUM(A)	*((double *)(A))  
+#include <stdbool.h>
 
 typedef enum {
 	NIL, STRING, 
@@ -12,15 +8,30 @@ typedef enum {
 	ARRAY, OBJECT
 } JItemType;
 
-typedef struct {
+typedef struct jitem JItem;
+typedef struct jvalue JValue;
+
+typedef struct jitem {
 	char *key;
-	void *value;
 	JItemType type;
+	union {
+		double num;
+		char *str;
+		bool boo;
+		JItem *obj;
+		JValue *arr;
+	} value;
 } JItem;
 
-typedef struct {
-	void *value;
+typedef struct jvalue {
 	JItemType type;
+	union {
+		double num;
+		char *str;
+		bool boo;
+		JItem *obj;
+		JValue *arr;
+	} value;
 } JValue;
 
 void print_item(JItem *restrict item);
