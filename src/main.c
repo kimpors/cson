@@ -32,11 +32,11 @@ int main(int argc, char *argv[])
 	{
 		// print_tok(&toks[jindex - 1]);
 	}
-	JItem *items = parse(toks, jindex - 1);
+	JItem *items = jparseitem(toks, jindex - 1);
 
 	for (size_t i = 0; i < 1; i++)
 	{
-		print_item(&items[i]);
+		jprintitem(&items[i]);
 	}
 
 	return 0;

@@ -6,14 +6,14 @@ typedef enum {
 	NIL, STRING, 
 	NUMBER, BOOL,
 	ARRAY, OBJECT
-} JItemType;
+} JType;
 
 typedef struct jitem JItem;
 typedef struct jvalue JValue;
 
 typedef struct jitem {
 	char *key;
-	JItemType type;
+	JType type;
 	union {
 		double num;
 		char *str;
@@ -24,7 +24,7 @@ typedef struct jitem {
 } JItem;
 
 typedef struct jvalue {
-	JItemType type;
+	JType type;
 	union {
 		double num;
 		char *str;
@@ -34,5 +34,8 @@ typedef struct jvalue {
 	} value;
 } JValue;
 
-void print_item(JItem *restrict item);
-JItem *parse(JToken *toks, size_t lim);
+void jprintval(JValue *arr);
+void jprintitem(JItem *restrict item);
+JItem *jparseitem(JToken *toks, size_t lim);
+JValue *jparseval(JToken *toks, size_t lim);
+

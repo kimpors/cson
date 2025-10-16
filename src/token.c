@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void print_tok(JToken *restrict tok)
+void jprinttok(JToken *restrict tok)
 {
 	switch (tok->type)
 	{

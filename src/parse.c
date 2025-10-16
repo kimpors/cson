@@ -5,7 +5,7 @@
 #include "parse.h"
 #include "token.h"
 
-void print_value(JValue *arr)
+void jprintval(JValue *arr)
 {
 	switch (arr->type) 
 	{
@@ -29,7 +29,7 @@ void print_value(JValue *arr)
 			puts("object begin");
 			for (size_t i = 0; i < 2; i++)
 			{
-				print_item(&arr->value.obj[i]);
+				jprintitem(&arr->value.obj[i]);
 			}
 			puts("object end");
 			break;
@@ -38,14 +38,14 @@ void print_value(JValue *arr)
 			puts("array begin");
 			for (size_t i = 0; i < 2; i++)
 			{
-				print_value(&arr->value.arr[i]);
+				jprintval(&arr->value.arr[i]);
 			}
 			puts("array end");
 			break;
     }
 }
 
-void print_item(JItem *obj)
+void jprinttem(JItem *obj)
 {
 	printf("key: %s\n", obj->key);
 
@@ -71,7 +71,7 @@ void print_item(JItem *obj)
 			puts("object begin");
 			for (size_t i = 0; i < 2; i++)
 			{
-				print_item( &obj->value.obj[i]);
+				jprintitem( &obj->value.obj[i]);
 			}
 			puts("object end");
 			break;
@@ -80,7 +80,7 @@ void print_item(JItem *obj)
 			puts("array begin");
 			for (size_t i = 0; i < 6; i++)
 			{
-				print_value(&obj->value.arr[i]);
+				jprintval(&obj->value.arr[i]);
 			}
 			puts("array end");
 			break;
@@ -89,7 +89,7 @@ void print_item(JItem *obj)
 
 #define MAX_BUF	255
 
-JValue *parse_array(JToken *toks, size_t lim)
+JValue *jparseval(JToken *toks, size_t lim)
 {
 	size_t temp;
 	JValue *buf = malloc(sizeof(JValue) * MAX_BUF);
@@ -114,7 +114,7 @@ JValue *parse_array(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = OBJECT;
-					buf[j].value.obj = parse(toks + i, temp - i);
+					buf[j].value.obj = jparseitem(toks + i, temp - i);
 					i = temp;
 				}
 				else if (*toks[i].value == '[')
@@ -129,7 +129,7 @@ JValue *parse_array(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = ARRAY;
-					buf[j].value.arr = parse_array(toks + i, temp - i);
+					buf[j].value.arr = jparseval(toks + i, temp - i);
 					i = temp;
 				}
 				break;
@@ -170,7 +170,7 @@ JValue *parse_array(JToken *toks, size_t lim)
 	return buf;
 }
 
-JItem *parse(JToken *toks, size_t lim)
+JItem *jparseitem(JToken *toks, size_t lim)
 {
 	size_t temp = 0;
 	bool issep = false;
@@ -193,7 +193,7 @@ JItem *parse(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = OBJECT;
-					buf[j].value.obj = parse(toks + i, temp - i);
+					buf[j].value.obj = jparseitem(toks + i, temp - i);
 					i = temp;
 					break;
 				case '[':
@@ -207,7 +207,7 @@ JItem *parse(JToken *toks, size_t lim)
 					}
 
 					buf[j].type = ARRAY;
-					buf[j].value.arr = parse_array(toks + i, temp - i);
+					buf[j].value.arr = jparseval(toks + i, temp - i);
 					i = temp;
 					break;
 			}
