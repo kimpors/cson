@@ -18,5 +18,10 @@ typedef struct {
 	JItemType type;
 } JItem;
 
+typedef struct {
+	void *value;
+	JItemType type;
+} JValue;
+
 void print_item(JItem *restrict item);
 JItem *parse(JToken *toks, size_t lim);

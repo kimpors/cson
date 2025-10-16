@@ -63,7 +63,7 @@ char *gettoken(char *s, JToken *restrict dest, size_t lim)
 			dest->type = VALUE;
 			dest->value = malloc(ps - s);
 			strncpy(dest->value, s, ps - s);
-			s = ps + 1;
+			s = ps;
 			break;
 	}
 
