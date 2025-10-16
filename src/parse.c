@@ -27,6 +27,15 @@ void print_item(JItem *item)
 			puts("type: bool");
 			printf("value: %s\n", !JBOO(item->value) ? "false" : "true");
 			break;
+		case OBJECT:
+			puts("type: object");
+			puts("object begin");
+			for (size_t i = 0; i < 2; i++)
+			{
+				print_item(&((JItem *)item->value)[i]);
+			}
+			puts("object end");
+			break;
 		default:
           break;
     }
@@ -37,12 +46,40 @@ void print_item(JItem *item)
 JItem *parse(JToken *toks, size_t lim)
 {
 	size_t i = 0;
+	size_t temp = 0;
 	bool issep = false;
+	bool isobj = false;
 	JItem *buf = malloc(sizeof(JItem) * MAX_BUF);
 
 	for (size_t i = 0, j = 0; i < lim; i++)
 	{
-		if (toks[i].type == COMA)
+		if (toks[i].type == BRACKET)
+		{
+			switch ((long)toks[i].value) 
+			{
+				case '{':
+					if (!isobj) 
+					{
+						isobj = true;
+						continue;
+					}
+
+					for (temp = i; temp < lim; temp++)
+					{
+						if (toks[temp].type == BRACKET &&
+							(long)toks[temp].value == '}')
+						{
+							break;
+						}
+					}
+
+					buf[j].type = OBJECT;
+					buf[j].value = (void *)parse(toks + i, temp - i);
+					i = temp;
+					break;
+			}
+		}
+		else if (toks[i].type == COMA)
 		{
 			j++;
 		}
