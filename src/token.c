@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void print_tok(JToken *tok)
+void print_tok(JToken *restrict tok)
 {
 	switch (tok->type)
 	{
@@ -24,7 +24,7 @@ void print_tok(JToken *tok)
 	}
 }
 
-char *gettoken(char *s, JToken *dest, size_t lim)
+char *gettoken(char *s, JToken *restrict dest, size_t lim)
 {
 	if (!s || !*s) return NULL;
 	while (lim-- > 0 && isspace(*s)) s++;
@@ -58,7 +58,7 @@ char *gettoken(char *s, JToken *dest, size_t lim)
 			break;
 		default:
 			ps = s;
-			while (*ps != '\0' && isalnum(*++ps));
+			while (isalnum(*++ps));
 
 			dest->type = VALUE;
 			dest->value = malloc(ps - s);

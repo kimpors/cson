@@ -1,3 +1,4 @@
+#include "parse.h"
 #include "token.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -5,7 +6,10 @@
 #define MAX_FILE_SIZE 1024
 
 static FILE *fp;
-static char buf[MAX_FILE_SIZE] = "{\"name\":\"John\", \"age\":12}";
+static char buf[MAX_FILE_SIZE] = "{\"name\":\"John\", \"age\":12 }";
+
+size_t jindex = 0;
+JToken toks[255];
 
 int main(int argc, char *argv[])
 {
@@ -23,9 +27,12 @@ int main(int argc, char *argv[])
 
 	JToken tok;
 	char *ps = buf;
-	while ((ps = gettoken(ps, &tok, MAX_FILE_SIZE)))
+	while ((ps = gettoken(ps, &toks[jindex++], MAX_FILE_SIZE)));
+	JItem *items = parse(toks, jindex - 1);
+
+	for (size_t i = 0; i < 2; i++)
 	{
-		print_tok(&tok);
+		print_item(&items[i]);
 	}
 
 	return 0;

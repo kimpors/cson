@@ -5,8 +5,6 @@ TARGET = build/cson
 CFLAGS += -Iinclude
 
 all: $(TARGET)
-run: $(TARGET) 
-	./build/cson
 
 compile: build/compile_commands.json
 
