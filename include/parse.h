@@ -11,17 +11,11 @@ typedef enum {
 typedef struct jitem JItem;
 typedef struct jvalue JValue;
 
-typedef struct jitem {
-	char *key;
-	JType type;
-	union {
-		double num;
-		char *str;
-		bool boo;
-		JItem *obj;
-		JValue *arr;
-	} value;
-} JItem;
+typedef struct {
+	JValue *values;
+	size_t size;
+	char **keys;
+} JObject;
 
 typedef struct jvalue {
 	JType type;
@@ -29,13 +23,9 @@ typedef struct jvalue {
 		double num;
 		char *str;
 		bool boo;
-		JItem *obj;
-		JValue *arr;
+		JObject *obj;
 	} value;
 } JValue;
 
-void jprintval(JValue *arr);
-void jprintitem(JItem *restrict item);
-JItem *jparseitem(JToken *toks, size_t lim);
-JValue *jparseval(JToken *toks, size_t lim);
-
+JObject *jparse(JToken *toks, size_t lim, bool isobj);
+void jprintobj(JObject *obj, bool isobj);

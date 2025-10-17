@@ -2,259 +2,135 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+
 #include "parse.h"
 #include "token.h"
 
-void jprintval(JValue *arr)
+void jprintobj(JObject *obj, bool isobj)
 {
-	switch (arr->type) 
+	for (size_t i = 0; i < obj->size; i++)
 	{
-        case NIL:
-			puts("type: nil");
-			break;
-        case STRING:
-			puts("type: string");
-			printf("value: %s\n", arr->value.str);
-			break;
-        case NUMBER:
-			puts("type: number");
-			printf("value: %lf\n", arr->value.num);
-			break;
-        case BOOL:
-			puts("type: bool");
-			printf("value: %s\n", !arr->value.boo ? "false" : "true");
-			break;
-		case OBJECT:
-			puts("type: object");
-			puts("object begin");
-			for (size_t i = 0; i < 2; i++)
-			{
-				jprintitem(&arr->value.obj[i]);
+		if (isobj)
+		{
+			printf("key: %s\n", obj->keys[i]);
+		}
+
+		switch (obj->values[i].type)
+		{
+			case NIL:
+				puts("type: nil");
+				break;
+			case STRING:
+				puts("type: string");
+				printf("value: %s\n", obj->values[i].value.str);
+				break;
+			case NUMBER:
+				puts("type: number");
+				printf("value: %lf\n", obj->values[i].value.num);
+				break;
+			case BOOL:
+				puts("type: bool");
+				printf("value: %s\n", !obj->values[i].value.boo ? "false" : "true");
+				break;
+			case OBJECT:
+				puts("type: object");
+				puts("object begin");
+				jprintobj(obj->values[i].value.obj, true);
+				puts("object end");
+				break;
+			case ARRAY:
+				puts("type: array");
+				puts("array begin");
+				jprintobj(obj->values[i].value.obj, false);
+				puts("array end");
+				break;
 			}
-			puts("object end");
-			break;
-		case ARRAY:
-			puts("type: array");
-			puts("array begin");
-			for (size_t i = 0; i < 2; i++)
-			{
-				jprintval(&arr->value.arr[i]);
-			}
-			puts("array end");
-			break;
-    }
+        }
 }
 
-void jprinttem(JItem *obj)
+#define MAX_BUF	128
+
+JObject *jparse(JToken *toks, size_t lim, bool isobj)
 {
-	printf("key: %s\n", obj->key);
+	size_t j = 0;
+	char brack = '}';
+	bool issep = false;
 
-	switch (obj->type) 
-	{
-        case NIL:
-			puts("type: nil");
-			break;
-        case STRING:
-			puts("type: string");
-			printf("value: %s\n", obj->value.str);
-			break;
-        case NUMBER:
-			puts("type: number");
-			printf("value: %lf\n", obj->value.num);
-			break;
-        case BOOL:
-			puts("type: bool");
-			printf("value: %s\n", !obj->value.boo ? "false" : "true");
-			break;
-		case OBJECT:
-			puts("type: object");
-			puts("object begin");
-			for (size_t i = 0; i < 2; i++)
-			{
-				jprintitem( &obj->value.obj[i]);
-			}
-			puts("object end");
-			break;
-		case ARRAY:
-			puts("type: array");
-			puts("array begin");
-			for (size_t i = 0; i < 6; i++)
-			{
-				jprintval(&obj->value.arr[i]);
-			}
-			puts("array end");
-			break;
-    }
-}
+	JObject *buf = malloc(sizeof(JObject));
+	buf->keys = calloc(MAX_BUF, sizeof(char *));
+	buf->values = calloc(MAX_BUF, sizeof(JValue));
 
-#define MAX_BUF	255
+	JValue *pval = &buf->values[j];
 
-JValue *jparseval(JToken *toks, size_t lim)
-{
-	size_t temp;
-	JValue *buf = malloc(sizeof(JValue) * MAX_BUF);
-
-	for (size_t i = 1, j = 0; i < lim; i++)
+	for (size_t i = 1, temp = 0; i < lim; i++)
 	{
 		switch (toks[i].type)
 		{
-			case COMA:
-				j++;
+			case COMA: 
+				pval = &buf->values[++j];
 				break;
+			case SEPARATOR: issep = true; break;
 			case BRACKET:
-				if (*toks[i].value == '{')
+				if ((long) toks[i].value == ']' ||
+					(long) toks[i].value == '}')
 				{
-					for (temp = i; temp < lim; temp++)
-					{
-						if (toks[temp].type == BRACKET &&
-							(long)toks[temp].value == '}')
-						{
-							break;
-						}
-					}
-
-					buf[j].type = OBJECT;
-					buf[j].value.obj = jparseitem(toks + i, temp - i);
-					i = temp;
+					continue;
 				}
-				else if (*toks[i].value == '[')
+						
+				if ((long) toks[i].value == '[')
 				{
-					for (temp = i; temp < lim; temp++)
-					{
-						if (toks[temp].type == BRACKET &&
-							(long)toks[temp].value == ']')
-						{
-							break;
-						}
-					}
-
-					buf[j].type = ARRAY;
-					buf[j].value.arr = jparseval(toks + i, temp - i);
-					i = temp;
+					brack = ']';
 				}
+
+				for (temp = i; temp < lim; temp++)
+				{
+					if (toks[temp].type == BRACKET &&
+						(long)toks[temp].value == brack)
+					{
+						break;
+					}
+				}
+
+				buf->size++;
+				pval->type = brack == '{' ? OBJECT : ARRAY;
+				pval->value.obj = jparse(toks + i, temp - i, pval->type == OBJECT);
+				i = temp;
 				break;
 			case VALUE:
-					if (*toks[i].value == '"')
-					{
-						buf[j].type = STRING;
-						buf[j].value.str = toks[i].value + 1;
-					}
-					else if (isdigit(*toks[i].value))
-					{
-						buf[j].type = NUMBER;
-						buf[j].value.num = atof(toks[i].value);
-					}
-					else if (!strncmp(toks[i].value, "null", 4))
-					{
-						buf[j].type = NIL;
-						buf[j].value.boo = NULL;
-					}
-					else if (!strncmp(toks[i].value, "true", 4))
-					{
-						buf[j].type = BOOL;
-						buf[j].value.boo = true;
-					}
-					else if (!strncmp(toks[i].value, "false", 5))
-					{
-						buf[j].type = BOOL;
-						buf[j].value.boo = false;
-					}
+				if (isobj && !buf->keys[j])
+				{
+					buf->keys[j] = toks[i].value + 1;
+					continue;
+				}
+
+				buf->size++;
+
+				if (*toks[i].value == '"')
+				{
+					pval->type = STRING;
+					pval->value.str = toks[i].value + 1;
+				}
+				else if (isdigit(*toks[i].value))
+				{
+					pval->type = NUMBER;
+					pval->value.num = atof(toks[i].value);
+				}
+				else if (!strncmp(toks[i].value, "null", 4))
+				{
+					pval->type = NIL;
+					pval->value.boo = NULL;
+				}
+				else if (!strncmp(toks[i].value, "true", 4))
+				{
+					pval->type = BOOL;
+					pval->value.boo = true;
+				}
+				else if (!strncmp(toks[i].value, "false", 5))
+				{
+					pval->type = BOOL;
+					pval->value.boo = false;
+				}
 				break;
-			default:
-				fprintf(stderr, "parse_array: wrong format <|-_-|>\n");
-				return NULL;
-				break;
-		}
-	}
-
-	return buf;
-}
-
-JItem *jparseitem(JToken *toks, size_t lim)
-{
-	size_t temp = 0;
-	bool issep = false;
-	JItem *buf = malloc(sizeof(JItem) * MAX_BUF);
-
-	for (size_t i = 1, j = 0; i < lim; i++)
-	{
-		if (toks[i].type == BRACKET)
-		{
-			switch ((long)toks[i].value) 
-			{
-				case '{':
-					for (temp = i; temp < lim; temp++)
-					{
-						if (toks[temp].type == BRACKET &&
-							(long)toks[temp].value == '}')
-						{
-							break;
-						}
-					}
-
-					buf[j].type = OBJECT;
-					buf[j].value.obj = jparseitem(toks + i, temp - i);
-					i = temp;
-					break;
-				case '[':
-					for (temp = i; temp < lim; temp++)
-					{
-						if (toks[temp].type == BRACKET &&
-							(long)toks[temp].value == ']')
-						{
-							break;
-						}
-					}
-
-					buf[j].type = ARRAY;
-					buf[j].value.arr = jparseval(toks + i, temp - i);
-					i = temp;
-					break;
-			}
-		}
-		else if (toks[i].type == COMA)
-		{
-			j++;
-		}
-		else if (toks[i].type == SEPARATOR)
-		{
-			issep = true;
-		}
-		else if (toks[i].type == VALUE)
-		{
-			if (!issep)
-			{
-				buf[j].key = toks[i].value + 1;
-				continue;
-			}
-
-			if (*toks[i].value == '"')
-			{
-				buf[j].type = STRING;
-				buf[j].value.str = toks[i].value + 1;
-			}
-			else if (isdigit(*toks[i].value))
-			{
-				buf[j].type = NUMBER;
-				buf[j].value.num = atof(toks[i].value);
-			}
-			else if (!strncmp(toks[i].value, "null", 4))
-			{
-				buf[j].type = NIL;
-				buf[j].value.boo = NULL;
-			}
-			else if (!strncmp(toks[i].value, "true", 4))
-			{
-				buf[j].type = BOOL;
-				buf[j].value.boo = true;
-			}
-			else if (!strncmp(toks[i].value, "false", 5))
-			{
-				buf[j].type = BOOL;
-				buf[j].value.boo = false;
-			}
-
-			issep = false;
 		}
 	}
 

@@ -7,7 +7,7 @@
 
 static FILE *fp;
 static char buf[MAX_FILE_SIZE] = "{\"items\":[\"apple\", null, false, true, 240, \"bananan\"]}";
-// static char buf[MAX_FILE_SIZE] = "{\"name\":null,\"age\":44}";
+// static char buf[MAX_FILE_SIZE] = "{\"name\":\"hello\",\"age\":44}";
 
 size_t jindex = 0;
 JToken toks[255];
@@ -28,16 +28,13 @@ int main(int argc, char *argv[])
 
 	JToken tok;
 	char *ps = buf;
-	while ((ps = gettoken(ps, &toks[jindex++], MAX_FILE_SIZE)))
+	while ((ps = jgettoken(ps, &toks[jindex++], MAX_FILE_SIZE)))
 	{
 		// print_tok(&toks[jindex - 1]);
 	}
-	JItem *items = jparseitem(toks, jindex - 1);
 
-	for (size_t i = 0; i < 1; i++)
-	{
-		jprintitem(&items[i]);
-	}
+	JObject *buf = jparse(toks, jindex - 1, true);
+	jprintobj(buf, true);
 
 	return 0;
 }

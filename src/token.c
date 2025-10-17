@@ -19,12 +19,12 @@ void jprinttok(JToken *restrict tok)
 			break;
 		case VALUE:
 			puts("type: value");
-			printf("value: %s\n", (char *)(long)tok->value);
+			printf("value: %s\n", (char *)tok->value);
 			break;
 	}
 }
 
-char *gettoken(char *s, JToken *restrict dest, size_t lim)
+char *jgettoken(char *s, JToken *restrict dest, size_t lim)
 {
 	if (!s || !*s) return NULL;
 	while (lim-- > 0 && isspace(*s)) s++;

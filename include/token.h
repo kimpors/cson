@@ -12,4 +12,4 @@ typedef struct {
 } JToken;
 
 void print_tok(JToken *tok);
-char *gettoken(char *s, JToken *dest, size_t lim);
+char *jgettoken(char *s, JToken *restrict dest, size_t lim);
