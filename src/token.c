@@ -8,18 +8,16 @@ void jprinttok(JToken *restrict tok)
 	switch (tok->type)
 	{
 		case BRACKET:
-			puts("type: bracket");
-			printf("value: %c\n", (char)(long)tok->value);
+			printf("[TYPE: %9s]\t[VALUE: '%c']\n", "bracket", (char)(long)tok->value);
 			break;
 		case SEPARATOR:
-			puts("type: separator");
+			printf("[TYPE: %9s]\n", "separator");
 			break;
 		case COMA:
-			puts("type: coma");
+			printf("[TYPE: %9s]\n", "coma");
 			break;
 		case VALUE:
-			puts("type: value");
-			printf("value: %s\n", (char *)tok->value);
+			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "value", (char *)tok->value);
 			break;
 	}
 }

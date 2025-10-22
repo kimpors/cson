@@ -6,7 +6,7 @@
 #define MAX_FILE_SIZE 1024
 
 static FILE *fp;
-static char buf[MAX_FILE_SIZE] = "{\"items\":[\"apple\", null, false, true, 240, \"bananan\"]}";
+static char buf[MAX_FILE_SIZE] = "{\n\t\"items\":[\"apple\", null, false, true, 240, \"bananan\"]\n}";
 // static char buf[MAX_FILE_SIZE] = "{\"name\":\"hello\",\"age\":44}";
 
 size_t jindex = 0;
@@ -30,8 +30,10 @@ int main(int argc, char *argv[])
 	char *ps = buf;
 	while ((ps = jgettoken(ps, &toks[jindex++], MAX_FILE_SIZE)))
 	{
-		// print_tok(&toks[jindex - 1]);
+		jprinttok(&toks[jindex - 1]);
 	}
+
+	puts("");
 
 	JObject *buf = jparse(toks, jindex - 1, true);
 	jprintobj(buf, true);

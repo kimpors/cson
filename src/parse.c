@@ -12,37 +12,34 @@ void jprintobj(JObject *obj, bool isobj)
 	{
 		if (isobj)
 		{
-			printf("key: %s\n", obj->keys[i]);
+			printf("[KEY: %10s]\n", obj->keys[i]);
 		}
 
 		switch (obj->values[i].type)
 		{
 			case NIL:
-				puts("type: nil");
+				printf("[TYPE: %10s]\n", "nil");
 				break;
 			case STRING:
-				puts("type: string");
-				printf("value: %s\n", obj->values[i].value.str);
+				printf("[TYPE: %10s]\t[VALUE: %s]\n", "string", obj->values[i].value.str);
 				break;
 			case NUMBER:
-				puts("type: number");
-				printf("value: %lf\n", obj->values[i].value.num);
+				printf("[TYPE: %10s]\t[VALUE: %lf]\n", "number", obj->values[i].value.num);
 				break;
 			case BOOL:
-				puts("type: bool");
-				printf("value: %s\n", !obj->values[i].value.boo ? "false" : "true");
+				printf("[TYPE: %10s]\t[VALUE: %s]\n", "bool", !obj->values[i].value.boo ? "false" : "true");
 				break;
 			case OBJECT:
-				puts("type: object");
-				puts("object begin");
+				printf("[TYPE: %10s]\n", "object");
+				puts("[OBJECT BEGIN]");
 				jprintobj(obj->values[i].value.obj, true);
-				puts("object end");
+				puts("[OBJECT END]");
 				break;
 			case ARRAY:
-				puts("type: array");
-				puts("array begin");
+				printf("[TYPE: %10s]\n", "array");
+				puts("[ARRAY BEGIN]");
 				jprintobj(obj->values[i].value.obj, false);
-				puts("array end");
+				puts("[ARRAY END]");
 				break;
 			}
         }

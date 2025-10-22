@@ -11,5 +11,5 @@ typedef struct {
 	JTokenType type;
 } JToken;
 
-void print_tok(JToken *tok);
+void jprinttok(JToken *restrict tok);
 char *jgettoken(char *s, JToken *restrict dest, size_t lim);
