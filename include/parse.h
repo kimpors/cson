@@ -27,5 +27,6 @@ typedef struct jvalue {
 	} value;
 } JValue;
 
-JObject *jparse(JToken *toks, size_t lim, bool isobj);
+JObject *jalloc(size_t size, bool isobj);
 void jprintobj(JObject *obj, bool isobj);
+JObject *jparse(JToken *toks, size_t lim, bool isobj);

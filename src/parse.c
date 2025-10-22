@@ -47,16 +47,47 @@ void jprintobj(JObject *obj, bool isobj)
 
 #define MAX_BUF	128
 
+JObject *jalloc(size_t size, bool isobj)
+{
+	JObject *buf = malloc(sizeof(JObject));
+
+	if (!buf) return NULL;
+	
+	if (isobj) 
+	{
+		buf->keys = calloc(size, sizeof(char *));
+		if (!buf->keys)
+		{
+			free(buf);
+			return NULL;
+		}
+	}
+
+	buf->values = calloc(size, sizeof(JValue));
+
+	if (!buf->values)
+	{
+		if (isobj) free(buf->keys);
+		free(buf);
+		return NULL;
+	}
+
+	return buf;
+}
+
 JObject *jparse(JToken *toks, size_t lim, bool isobj)
 {
+	size_t len = 1;
 	size_t j = 0;
 	char brack = '}';
 	bool issep = false;
 
-	JObject *buf = malloc(sizeof(JObject));
-	buf->keys = calloc(MAX_BUF, sizeof(char *));
-	buf->values = calloc(MAX_BUF, sizeof(JValue));
+	for (size_t i = 1; i < lim; i++)
+	{
+		if (toks[i].type == COMA) len++;
+	}
 
+	JObject *buf = jalloc(len, isobj);
 	JValue *pval = &buf->values[j];
 
 	for (size_t i = 1, temp = 0; i < lim; i++)

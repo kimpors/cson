@@ -26,6 +26,7 @@ char *jgettoken(char *s, JToken *restrict dest, size_t lim)
 {
 	if (!s || !*s) return NULL;
 	while (lim-- > 0 && isspace(*s)) s++;
+	if (!*s) return NULL;
 
 	char *ps = s;
 
