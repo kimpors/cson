@@ -13,6 +13,18 @@ JToken toks[255];
 
 int main(int argc, char *argv[])
 {
+	JTokens *arr = jtoksinit(20);
+
+	printf("id: %ld\n", arr->id);
+	printf("cap: %ld\n", arr->capacity);
+
+	jtokspush(arr, VALUE, "HELLO");
+	jtokspush(arr, VALUE, "THERE");
+	printf("val: %s\n", arr->toks[0].value);
+	printf("val: %s\n", arr->toks[1].value);
+
+	return 0;
+
 	size_t len;
 	if (argc >= 2 && (fp = fopen(argv[1], "r")) == NULL)
 	{

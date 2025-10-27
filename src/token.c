@@ -1,4 +1,5 @@
 #include "token.h"
+#include "pool.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -67,4 +68,24 @@ char *jgettoken(char *s, JToken *restrict dest, size_t lim)
 	}
 
 	return s;
+}
+
+JTokens *jtoksinit(size_t capacity)
+{
+	JTokens *toks = jgettoks();
+
+	if (!jpoolinit(toks->id, TOKEN, 69))
+	{
+		fprintf(stderr, "cannot initilize tokens buffer =_=");
+		return NULL;
+	}
+	return toks;
+}
+
+JToken *jtokspush(JTokens *dest, JTokenType type, char *val)
+{
+	// if (dest->size >= dest->capacity) //expand
+
+	jpoolpush(dest->id, TOKEN, &(JToken){ val, type }, sizeof(JToken));
+	return dest->toks + dest->size - 1;
 }
