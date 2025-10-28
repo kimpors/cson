@@ -18,7 +18,8 @@ typedef struct {
 	size_t capacity;
 } JTokens;
 
-void jprinttok(JToken *restrict tok);
+void jtoksprint(JTokens *toks);
+void jtokprint(JToken *restrict tok);
 char *jgettoken(char *s, JToken *restrict dest, size_t lim);
 
 JTokens *jtoksinit(size_t capacity);

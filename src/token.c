@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void jprinttok(JToken *restrict tok)
+void jtokprint(JToken *restrict tok)
 {
 	switch (tok->type)
 	{
@@ -20,6 +20,17 @@ void jprinttok(JToken *restrict tok)
 		case VALUE:
 			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "value", (char *)tok->value);
 			break;
+	}
+}
+
+void jtoksprint(JTokens *toks)
+{
+	printf("[ID: %2ld][SIZE: %4ld][CAPACITY: %4ld]\n", toks->id, toks->size, toks->capacity);
+	printf("====================================\n");
+
+	for (size_t i = 0; i < toks->size; i++)
+	{
+		jtokprint(toks->toks + i);
 	}
 }
 

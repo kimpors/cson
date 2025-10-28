@@ -15,12 +15,9 @@ int main(int argc, char *argv[])
 {
 	JTokens *arr = jtoksinit(2);
 
-	printf("id: %ld\n", arr->id);
-
 	jtokspush(arr, VALUE, "HELLO");
 	jtokspush(arr, VALUE, "THERE");
-	printf("val: %s\n", arr->toks[0].value);
-	printf("val: %s\n", arr->toks[1].value);
+	jtoksprint(arr);
 
 	return 0;
 
@@ -41,10 +38,10 @@ int main(int argc, char *argv[])
 
 	JToken tok;
 	char *ps = buf;
-	while ((ps = jgettoken(ps, &toks[jindex++], MAX_FILE_SIZE)))
-	{
-		jprinttok(&toks[jindex - 1]);
-	}
+	// while ((ps = jgettoken(ps, &toks[jindex++], MAX_FILE_SIZE)))
+	// {
+	// 	jprinttok(&toks[jindex - 1]);
+	// }
 
 	puts("");
 

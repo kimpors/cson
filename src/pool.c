@@ -14,6 +14,7 @@ static JPool tokvalpool[BUF_SIZE];
 
 void *jpoolinit(size_t id, JPoolType type, size_t capacity)
 {
+	if (id >= BUF_SIZE) return NULL;
 	if (!capacity) capacity = POOL_INIT_SIZE; 
 
 	switch (type)
@@ -45,6 +46,8 @@ void *jpoolinit(size_t id, JPoolType type, size_t capacity)
 
 void *jpoolexpand(size_t id, JPoolType type)
 {
+	if (id >= BUF_SIZE) return NULL;
+
 	JPool *tok = tokpool + id;
 	JPool *val = tokvalpool + id;
 
@@ -59,7 +62,6 @@ void *jpoolexpand(size_t id, JPoolType type)
 
 			toksbuf->capacity *= 1.5;
 			tok->capacity *= 1.5;
-			printf("tok cap: %ld\n", tok->capacity);
 			return tok->data;
 		case JTOKEN_STR:
 			if (!(val->data = realloc(val->data, val->capacity * 2)))
@@ -69,7 +71,6 @@ void *jpoolexpand(size_t id, JPoolType type)
 			}
 
 			val->capacity *= 2;
-			printf("str cap: %ld\n", val->capacity);
 			return val->data;
 	}
 
