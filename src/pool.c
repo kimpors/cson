@@ -12,38 +12,69 @@ static JTokens toksbuf[BUF_SIZE];
 static JPool tokpool[BUF_SIZE];
 static JPool tokvalpool[BUF_SIZE];
 
-
 void *jpoolinit(size_t id, JPoolType type, size_t capacity)
 {
 	if (!capacity) capacity = POOL_INIT_SIZE; 
 
-	JPool *pool;
 	switch (type)
 	{
-		case TOKEN:
+		case JTOKEN:
 			if(!(tokpool[id].data = calloc(capacity, sizeof(JToken))))
 			{
 				fprintf(stderr, "cannot allocate memory in pool init =_=");
 				return NULL;
 			}
 
-
+			tokpool[id].capacity = capacity;
+			toksbuf[id].capacity = capacity;
+			toksbuf[id].toks = tokpool[id].data;
+			return &tokpool[id].data;
+		case JTOKEN_STR:
 			if(!(tokvalpool[id].data = calloc(capacity, sizeof(char))))
 			{
 				fprintf(stderr, "cannot allocate memory in pool init =_=");
 				return NULL;
 			}
 
-			tokpool[id].capacity = capacity;
 			tokvalpool[id].capacity = capacity;
-			toksbuf[id].capacity = capacity;
-			toksbuf[id].toks = tokpool[id].data;
-			return &tokpool[id];
+			return &tokvalpool[id].data;
 	}
 
 	return NULL;
 }
 
+void *jpoolexpand(size_t id, JPoolType type)
+{
+	JPool *tok = tokpool + id;
+	JPool *val = tokvalpool + id;
+
+	switch (type)
+	{
+		case JTOKEN:
+			if (!(tok->data = realloc(tok->data, tok->capacity * 1.5)))
+			{
+				fprintf(stderr, "cannot allocate memory in pool init =_=");
+				return NULL;
+			}
+
+			toksbuf->capacity *= 1.5;
+			tok->capacity *= 1.5;
+			printf("tok cap: %ld\n", tok->capacity);
+			return tok->data;
+		case JTOKEN_STR:
+			if (!(val->data = realloc(val->data, val->capacity * 2)))
+			{
+				fprintf(stderr, "cannot allocate memory in pool init =_=");
+				return NULL;
+			}
+
+			val->capacity *= 2;
+			printf("str cap: %ld\n", val->capacity);
+			return val->data;
+	}
+
+	return NULL;
+}
 
 void *jpoolpush(size_t id, JPoolType type, void *data, size_t size)
 {
@@ -52,24 +83,29 @@ void *jpoolpush(size_t id, JPoolType type, void *data, size_t size)
 	JPool *val = tokvalpool + id;
 	JToken *temp;
 
-	void *res;
-
 	switch (type)
 	{
-		case TOKEN:
-			printf("buf size: %ld\n", buf->size);
+		case JTOKEN:
+			if (tok->size + size >= tok->capacity &&
+					!jpoolexpand(id, JTOKEN)) return NULL;
+
 			temp = data;
-			size_t len = strlen(temp->value);
 			memcpy(buf->toks + buf->size, data, size);
-			buf->toks[buf->size].value = val->data + val->size;
-			memcpy(buf->toks[buf->size].value, temp->value, len);
-			buf->toks[buf->size].value[len] = '\0';
-			val->size += len + 1;
+			jpoolpush(id, JTOKEN_STR, temp->value, strlen(temp->value));
 			buf->size++;
 			return buf->toks + buf->size - 1;
+		case JTOKEN_STR:
+			if (val->size + size >= val->capacity &&
+					!jpoolexpand(id, JTOKEN_STR)) return NULL;
+
+			buf->toks[buf->size].value = val->data + val->size;
+			memcpy(buf->toks[buf->size].value, data, size);
+			buf->toks[buf->size].value[size] = '\0';
+			val->size += size + 1;
+			return buf->toks[buf->size].value;
 	}
 
-	return res;
+	return NULL;
 }
 
 JTokens *jgettoks(void)

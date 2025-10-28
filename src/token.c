@@ -74,18 +74,23 @@ JTokens *jtoksinit(size_t capacity)
 {
 	JTokens *toks = jgettoks();
 
-	if (!jpoolinit(toks->id, TOKEN, 69))
+	if (!jpoolinit(toks->id, JTOKEN, capacity))
 	{
 		fprintf(stderr, "cannot initilize tokens buffer =_=");
 		return NULL;
 	}
+
+	if (!jpoolinit(toks->id, JTOKEN_STR, capacity))
+	{
+		fprintf(stderr, "cannot initilize tokens buffer =_=");
+		return NULL;
+	}
+
 	return toks;
 }
 
 JToken *jtokspush(JTokens *dest, JTokenType type, char *val)
 {
-	// if (dest->size >= dest->capacity) //expand
-
-	jpoolpush(dest->id, TOKEN, &(JToken){ val, type }, sizeof(JToken));
+	jpoolpush(dest->id, JTOKEN, &(JToken){ val, type }, sizeof(JToken));
 	return dest->toks + dest->size - 1;
 }

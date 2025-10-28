@@ -13,10 +13,9 @@ JToken toks[255];
 
 int main(int argc, char *argv[])
 {
-	JTokens *arr = jtoksinit(20);
+	JTokens *arr = jtoksinit(2);
 
 	printf("id: %ld\n", arr->id);
-	printf("cap: %ld\n", arr->capacity);
 
 	jtokspush(arr, VALUE, "HELLO");
 	jtokspush(arr, VALUE, "THERE");

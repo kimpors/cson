@@ -4,7 +4,7 @@
 #define INIT_ALLOC 128
 
 typedef enum {
-	TOKEN
+	JTOKEN, JTOKEN_STR,
 } JPoolType;
 
 typedef struct {
