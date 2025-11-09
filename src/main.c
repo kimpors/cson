@@ -1,4 +1,5 @@
 #include "token.h"
+#include "tokens.h"
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -13,13 +14,8 @@ JToken toks[255];
 
 int main(int argc, char *argv[])
 {
-	JTokens arr = { 0 };
+	JTokens arr;
 	jtoksinit(&arr, 2);
-
-	// for (size_t i = 0; i < arr.capacity; i++)
-	// {
-	// 	jtokinit(&arr.toks[i], 32);
-	// }
 
 	size_t len = 0;
 	if (argc >= 2 && (fp = fopen(argv[1], "r")) == NULL)
@@ -36,11 +32,7 @@ int main(int argc, char *argv[])
 
 	if (len) buf[len] = '\0';
 
-	JToken tok;
-	char *ps = buf;
-	while ((ps = jgettoken(ps, &arr, MAX_FILE_SIZE)));
+	jtoksget(&arr, buf, MAX_FILE_SIZE);
 	jtoksprint(&arr);
-
-	exit(1);
-	return 0;
+	exit(0);
 }
