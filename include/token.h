@@ -9,18 +9,22 @@ typedef enum {
 typedef struct {
 	char *value;
 	JTokenType type;
+	size_t size;
+	size_t capacity;
 } JToken;
 
 typedef struct {
 	JToken *toks;
-	size_t id;
 	size_t size;
 	size_t capacity;
 } JTokens;
 
 void jtoksprint(JTokens *toks);
 void jtokprint(JToken *restrict tok);
-char *jgettoken(char *s, JToken *restrict dest, size_t lim);
+char *jgettoken(char *s, JTokens *dest, size_t lim);
 
-JTokens *jtoksinit(size_t capacity);
-JToken *jtokspush(JTokens *dest, JTokenType type, char *val);
+char *jtokinit(JToken *dest, size_t capacity);
+char *jtokset(JToken *dest, const char *s, size_t size);
+
+JToken *jtokspush(JTokens *dest, JToken tok);
+JToken *jtoksinit(JTokens *dest, size_t capacity);
