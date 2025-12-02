@@ -1,5 +1,5 @@
 #pragma once
-#include <stdio.h>
+#include "stdlib.h"
 
 typedef enum {
 	VALUE, BRACKET,
@@ -7,13 +7,10 @@ typedef enum {
 } JTokenType;
 
 typedef struct {
-	char *value;
+	char *str;
 	JTokenType type;
-	size_t size;
-	size_t capacity;
 } JToken;
 
+void jtoksprint(JToken *toks);
 void jtokprint(JToken *restrict tok);
-char *jtokinit(JToken *dest, size_t capacity);
 char *jtokget(JToken *dest, char *s, size_t lim);
-char *jtokset(JToken *dest, const char *s, size_t size);

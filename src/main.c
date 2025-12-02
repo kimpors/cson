@@ -1,7 +1,9 @@
-#include "token.h"
-#include "tokens.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "jarray.h"
+#include "parse.h"
+#include "token.h"
 
 #define MAX_FILE_SIZE 1024
 
@@ -9,14 +11,8 @@ static FILE *fp;
 // static char buf[MAX_FILE_SIZE] = "{\n\t\"items\":[\"apple\", null, false, true, 240, \"bananan\"]\n}";
 static char buf[MAX_FILE_SIZE] = "{\n\t\"name\":\"apple\", \"age\": 34, \"isman\": false\n}";
 
-size_t jindex = 0;
-JToken toks[255];
-
 int main(int argc, char *argv[])
 {
-	JTokens arr;
-	jtoksinit(&arr, 2);
-
 	size_t len = 0;
 	if (argc >= 2 && (fp = fopen(argv[1], "r")) == NULL)
 	{
@@ -32,7 +28,16 @@ int main(int argc, char *argv[])
 
 	if (len) buf[len] = '\0';
 
-	jtoksget(&arr, buf, MAX_FILE_SIZE);
-	jtoksprint(&arr);
-	exit(0);
+	char *ps = buf;
+	JToken tok = { 0 };
+	JToken *toks = NULL;
+
+	while ((ps = jtokget(&tok, ps, MAX_FILE_SIZE)))
+	{
+		jpush(toks, tok);
+	}
+
+	jtoksprint(toks);
+	jfree(toks);
+	return 0;
 }

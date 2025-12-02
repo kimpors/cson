@@ -1,5 +1,5 @@
 CC = gcc
-SRC = src/main.c src/tokens.c src/token.c src/parse.c
+SRC = src/main.c src/token.c src/parse.c
 OBJ = $(SRC:.c=.o)
 TARGET = build/cson
 CFLAGS += -Iinclude

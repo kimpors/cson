@@ -1,14 +1,15 @@
 #include "token.h"
-#include <ctype.h>
-#include <stdlib.h>
 #include <string.h>
+#include "jarray.h"
+#include <stdio.h>
+#include <ctype.h>
 
 void jtokprint(JToken *restrict tok)
 {
 	switch (tok->type)
 	{
 		case BRACKET:
-			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "bracket", tok->value);
+			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "bracket", tok->str);
 			break;
 		case SEPARATOR:
 			printf("[TYPE: %9s]\n", "separator");
@@ -17,7 +18,7 @@ void jtokprint(JToken *restrict tok)
 			printf("[TYPE: %9s]\n", "coma");
 			break;
 		case VALUE:
-			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "value", (char *)tok->value);
+			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "value", (char *)tok->str);
 			break;
 	}
 }
@@ -29,13 +30,17 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 	if (!*s) return NULL;
 
 	char *ps;
+	char *temp = NULL;
 	switch (*s)
 	{
 		case '{': case '}':
 		case '[': case ']':
-			dest->size = 1;
+			jinit(temp, 2);
+			temp[0] = s[0];
+			temp[1] = '\0';
+
+			dest->str = temp;
 			dest->type = BRACKET;
-			jtokset(dest, s, dest->size);
 			s++;
 			break;
 		case ':':
@@ -49,69 +54,38 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 		case '"':
 			ps = s;
 			while (*ps != '\0' && *++ps != '"');
+
+			jinit(temp, (ps - s + 1));
+			strncpy(temp, s, ps - s);
+			temp[ps - s] = '\0';
+
+			dest->str = temp;
 			dest->type = VALUE;
-			dest->size = ps - s;
-			jtokset(dest, s, dest->size);
 			s = ps + 1;
 			break;
 		default:
 			ps = s;
 			while (isalnum(*++ps));
-			dest->size = ps - s;
+
+			jinit(temp, (ps - s + 1));
+			strncpy(temp, s, ps - s);
+			temp[ps - s] = '\0';
+
 			dest->type = VALUE;
-			jtokset(dest, s, dest->size);
+			dest->str = temp;
 			s = ps;
 			break;
 	}
-
 	return s;
 }
 
-char *jtokinit(JToken *dest, size_t capacity)
+void jtoksprint(JToken *toks)
 {
-	if (!dest || !capacity) return NULL;
+	printf("[SIZE: %4ld][CAPACITY: %4ld]\n", jlen(toks), jcap(toks));
+	printf("====================================\n");
 
-	dest->size = 0;
-	dest->capacity = capacity;
-	if (!(dest->value = calloc(capacity, sizeof(char))))
+	for (size_t i = 0; i < jlen(toks); i++)
 	{
-		fprintf(stderr, "can't init token\n");
-		return NULL;
+		jtokprint(&toks[i]);
 	}
-	
-	return dest->value;
-}
-
-char *jtokexpand(JToken *dest, size_t capacity)
-{
-	if (!dest || !capacity ||
-		dest->capacity >= capacity) return NULL;
-
-	if (!(dest->value = realloc(dest->value, capacity * sizeof(char))))
-	{
-		fprintf(stderr, "can't expand token\n");
-		return NULL;
-	}
-			
-	return dest->value;
-}
-
-char *jtokset(JToken *dest, const char *s, size_t size)
-{
-	if (!dest) return NULL;
-	if (!dest->capacity) 
-	{
-		jtokinit(dest, size);
-		dest->size = size;
-	}
-	if (size >= dest->capacity &&
-			!jtokexpand(dest, (dest->capacity + size) * 2))
-	{
-		fprintf(stderr, "can't set token\n");
-		return NULL;
-	}
-
-	strncpy(dest->value, s, size);
-	dest->value[size] = '\0';
-	return dest->value;
 }
