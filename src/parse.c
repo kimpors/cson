@@ -7,14 +7,11 @@
 #include "parse.h"
 #include "token.h"
 
-void jprintobj(JObject *obj, bool isobj)
+void jprintobj(JObject *obj)
 {
 	for (size_t i = 0; i < jlen(obj); i++)
 	{
-		if (isobj)
-		{
-			printf("[KEY: %10s]\n", obj[i].key);
-		}
+		printf("[KEY: %10s]\t", obj[i].key);
 
 		switch (obj[i].val.type)
 		{
@@ -33,121 +30,101 @@ void jprintobj(JObject *obj, bool isobj)
 			case OBJECT:
 				printf("[TYPE: %10s]\n", "object");
 				puts("[OBJECT BEGIN]");
-				jprintobj(obj[i].val.value.obj, true);
+				jprintobj(obj[i].val.value.obj);
 				puts("[OBJECT END]");
 				break;
 			case ARRAY:
 				printf("[TYPE: %10s]\n", "array");
 				puts("[ARRAY BEGIN]");
-				jprintobj(obj[i].val.value.obj, false);
+				jprintobj(obj[i].val.value.obj);
 				puts("[ARRAY END]");
 				break;
 			}
         }
 }
 
-JObject *jparse(JToken *toks, size_t lim, bool isobj)
+JObject *jparse(JToken *toks)
 {
-	size_t len = 1;
 	size_t j = 0;
 	char brack = '}';
 	bool issep = false;
 
-	for (size_t i = 1; i < lim; i++)
-	{
-		if (toks[i].type == COMA) len++;
-	}
+	JObject tmp = { 0 };
+	JObject *res = NULL;
 
-	JObject *buf = NULL;
-	jinit(buf, len);
-
-	JValue *pval = &buf[j].val;
-
-	for (size_t i = 1, temp = 0; i < lim; i++)
+	for (size_t i = 1, j = 0; i < jlen(toks); i++)
 	{
 		switch (toks[i].type)
 		{
 			case COMA: 
-				pval = &buf[++j].val;
+				issep = false;
+				jpush(res, tmp);
+				tmp = (JObject){ 0 };
 				break;
 			case SEPARATOR: issep = true; break;
 			case BRACKET:
-				if ((long) toks[i].str == ']' ||
-					(long) toks[i].str == '}')
+				if (toks[i].str[0] == ']' ||
+					toks[i].str[0] == '}')
 				{
+					jpush(res, tmp);
 					continue;
 				}
 						
-				if ((long) toks[i].str == '[')
+				if (toks[i].str[0] == '[')
 				{
 					brack = ']';
 				}
 
-				for (temp = i; temp < lim; temp++)
+				for (j = i; j < jlen(toks); j++)
 				{
-					if (toks[temp].type == BRACKET &&
-						(long)toks[temp].str == brack)
+					if (toks[j].type == BRACKET &&
+						toks[j].str[0] == brack)
 					{
 						break;
 					}
 				}
 
-				jlen(buf)++;
-				pval->type = brack == '{' ? OBJECT : ARRAY;
-				pval->value.obj = jparse(toks + i, temp - i, pval->type == OBJECT);
-				i = temp;
+				if (brack == '{')
+				{
+					tmp.val = ((JValue){ OBJECT, .value.obj = jparse(toks + i) });
+				}
+
+				i = j;
 				break;
 			case VALUE:
-				if (isobj && !buf[j].key)
+				if (!issep)
 				{
-					buf[j].key = toks[i].str + 1;
+					tmp.key = toks[i].str + 1;
 					continue;
 				}
 
-				jlen(buf)++;
-
 				if (*toks[i].str == '"')
 				{
-					char *temp = NULL;
-					jinit (temp, jlen(toks[i].str + 1));
-					strncpy(temp, toks[i].str, jlen(toks[i].str));
-					temp[jlen(temp)] = '\0';
-
-
-					// JToken *temp = NULL;
-					// jinit(temp, jlen(toks[i].str + 1));
-					// strncpy(temp[0].str, toks[i].str, jlen(toks[i].str));
-					// temp[0].str[jlen(temp[0].str)] = '\0';
-					jpush(pval, ((JValue){ STRING, .value.str = temp }));
-
-
-
-					// pval->type = STRING;
-					// jstrset(&pval->value.str, toks[i].str.value, toks[i].str.size);
+					jinit(tmp.val.value.str, jlen(toks[i].str));
+					jlen(tmp.val.value.str) = jlen(toks[i].str) - 1;
+					strncpy(tmp.val.value.str, toks[i].str + 1, jlen(toks[i].str) - 1);
+					tmp.val.value.str[jlen(tmp.val.value.str)] = '\0';
+					tmp.val.type = STRING;
 				}
 				else if (isdigit(*toks[i].str))
 				{
-					pval->type = NUMBER;
-					pval->value.num = atof(toks[i].str);
+					tmp.val = ((JValue){ NUMBER, .value.num = atof(toks[i].str)} );
 				}
 				else if (!strncmp(toks[i].str, "null", 4))
 				{
-					pval->type = NIL;
-					pval->value.boo = NULL;
+					tmp.val = ((JValue){ NIL, 0 });
 				}
 				else if (!strncmp(toks[i].str, "true", 4))
 				{
-					pval->type = BOOL;
-					pval->value.boo = true;
+					tmp.val = ((JValue){ BOOL, .value.boo = true });
 				}
 				else if (!strncmp(toks[i].str, "false", 5))
 				{
-					pval->type = BOOL;
-					pval->value.boo = false;
+					tmp.val = ((JValue){ BOOL, .value.boo = false });
 				}
 				break;
 		}
 	}
 
-	return buf;
+	return res;
 }

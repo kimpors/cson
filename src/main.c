@@ -38,6 +38,13 @@ int main(int argc, char *argv[])
 	}
 
 	jtoksprint(toks);
+
+	JObject *obj = NULL;
+
+	obj = jparse(toks);
+	jprintobj(obj);
+
+	jfree(obj);
 	jfree(toks);
 	return 0;
 }

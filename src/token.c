@@ -1,8 +1,8 @@
-#include "token.h"
 #include <string.h>
-#include "jarray.h"
-#include <stdio.h>
 #include <ctype.h>
+
+#include "token.h"
+#include "jarray.h"
 
 void jtokprint(JToken *restrict tok)
 {
@@ -36,6 +36,7 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 		case '{': case '}':
 		case '[': case ']':
 			jinit(temp, 2);
+			jlen(temp) = 1;
 			temp[0] = s[0];
 			temp[1] = '\0';
 
@@ -56,6 +57,7 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 			while (*ps != '\0' && *++ps != '"');
 
 			jinit(temp, (ps - s + 1));
+			jlen(temp) = (ps - s);
 			strncpy(temp, s, ps - s);
 			temp[ps - s] = '\0';
 
@@ -68,6 +70,7 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 			while (isalnum(*++ps));
 
 			jinit(temp, (ps - s + 1));
+			jlen(temp) = (ps - s);
 			strncpy(temp, s, ps - s);
 			temp[ps - s] = '\0';
 

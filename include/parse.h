@@ -8,7 +8,7 @@ typedef enum {
 	ARRAY, OBJECT
 } JType;
 
-typedef struct jarray JArray;
+typedef struct jvalue JValue;
 typedef struct jobject JObject;
 
 typedef struct jvalue {
@@ -17,7 +17,7 @@ typedef struct jvalue {
 		double num;
 		bool boo;
 		char *str;
-		JArray *arr;
+		JValue *arr;
 		JObject *obj;
 	} value;
 } JValue;
@@ -27,10 +27,7 @@ typedef struct jobject {
 	JValue val;
 } JObject;
 
-typedef struct jarray {
-	char *key;
-	JValue *vals;
-} JArray;
+void jprintobj(JObject *obj);
+// void jparse(JObject *dest, JToken *src);
 
-void jprintobj(JObject *obj, bool isobj);
-JObject *jparse(JToken *toks, size_t lim, bool isobj);
+JObject *jparse(JToken *toks);
