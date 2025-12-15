@@ -28,6 +28,4 @@ typedef struct jobject {
 } JObject;
 
 void jprintobj(JObject *obj);
-// void jparse(JObject *dest, JToken *src);
-
 JObject *jparse(JToken *toks);

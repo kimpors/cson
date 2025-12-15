@@ -13,6 +13,9 @@ static char buf[MAX_FILE_SIZE] = "{\n\t\"name\":\"apple\", \"age\": 34, \"isman\
 
 int main(int argc, char *argv[])
 {
+	puts("hello");
+	return 0;
+
 	size_t len = 0;
 	if (argc >= 2 && (fp = fopen(argv[1], "r")) == NULL)
 	{
