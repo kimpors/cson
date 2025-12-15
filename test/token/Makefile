@@ -18,10 +18,13 @@ compile: build/compile_commands.json
 
 test: $(all-tests)
 
-example/%.test: example/%.in example/%.cmp
-	@$(TARGET) $< 2>&1 | diff -q $(word 2, $?) - > /dev/null || \
-		(echo 'Test $@ failed' && exit 1)
+# example/%.test: example/%.in example/%.cmp
+# 	@$(TARGET) $< 2>&1 | diff -q $(word 2, $?) - > /dev/null || \
+# 		(echo 'Test $@ failed' && exit 1)
 
+example/%.test: example/%.in example/%.cmp
+	@$(TARGET) $< 2>&1 | diff  $(word 2, $?) - || \
+		(echo 'Test $@ failed' && exit 1)
 
 $(TARGET): $(SRC)
 	$(CC) $(SRC) -o $(TARGET) $(CFLAGS) $(DBFLAGS)

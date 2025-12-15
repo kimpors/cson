@@ -42,7 +42,12 @@ int main(int argc, char *argv[])
 		jpush(toks, tok);
 	}
 
-	jtoksprint_test(toks);
+	for (size_t i = 0; i < jlen(toks); i++)
+	{
+		jtokprint_test(&toks[i]);
+	}
+
+	putchar('\n');
 	jfree(toks);
 	return 0;
 }
