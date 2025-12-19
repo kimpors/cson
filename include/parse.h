@@ -8,24 +8,18 @@ typedef enum {
 	ARRAY, OBJECT
 } JType;
 
-typedef struct jvalue JValue;
-typedef struct jobject JObject;
+typedef struct jitem JItem;
 
-typedef struct jvalue {
+typedef struct jitem {
+	char *key;
 	JType type;
 	union {
 		double num;
 		bool boo;
 		char *str;
-		JValue *arr;
-		JObject *obj;
+		JItem *arr;
 	} value;
-} JValue;
+} JItem;
 
-typedef struct jobject {
-	char *key;
-	JValue val;
-} JObject;
-
-void jprintobj(JObject *obj);
-JObject *jparse(JToken *toks);
+void jprint(JItem *items);
+JItem *jparse(JToken *toks);
