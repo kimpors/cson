@@ -1,19 +1,32 @@
+SHELL := /bin/bash
+
 CC = gcc
-SRC = src/main.c src/token.c src/parse.c
-OBJ = $(SRC:.c=.o)
+SRC = $(wildcard src/*.c)
+OBJ = $(addprefix build/, $(notdir $(addsuffix .o, $(basename $(wildcard src/*c)))))
 TARGET = build/cson
+STATIC_TARGET = $(TARGET).a
+SHARED_TARGET = $(TARGET).so
 CFLAGS += -Iinclude
-DBFLAGS += -g
 MAKEFLAGS += --no-print-directory
 
-.PHONY: all compile token-test parse-test clean
+.PHONY: static shared compile token-test parse-test clean
 
-all: $(TARGET)
+shared: $(SHARED_TARGET)
+static: $(STATIC_TARGET)
+
+$(STATIC_TARGET): $(OBJ)
+	@echo "Building static library to $@"
+	@ar -rcs $(STATIC_TARGET) $(OBJ)
+
+$(SHARED_TARGET): $(SRC)
+	@echo "Building shared library to $@"
+	@gcc -shared -fPIC -Iinclude -o $@ $^
+
+$(OBJ): $(SRC)
+	@echo "Compiling object file to $@"
+	@$(CC) -c $(CFLAGS) $(addprefix src/, $(notdir $(basename $@))).c -o $@
 
 compile: build/compile_commands.json
-
-$(TARGET): $(SRC)
-	$(CC) $(SRC) -o $(TARGET) $(CFLAGS) $(DBFLAGS)
 
 test: token-test parse-test
 
@@ -26,10 +39,10 @@ parse-test:
 	@cd test/parse && $(MAKE)
 
 build/compile_commands.json:
-	echo -e '[{"directory": "/home/kimpors/project/cson",' 	\
+	echo -e '[{"directory": "$(shell pwd)",' 	\
 		'"command": "/usr/bin/cc src/main.c src/token.c -o'  \
-		'build/cson -I/home/kimpors/project/cson/include",'	\
+		'build/cson -I$(shell pwd)/include",'	\
 		'"file": "src/main.c"}]' > build/compile_commands.json
 
 clean:
-	rm -f build/cson
+	@rm -f build/cson.*
