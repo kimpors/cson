@@ -7,7 +7,7 @@
 #define MAX_FILE_SIZE 1024
 
 static FILE *fp;
-static char buf[MAX_FILE_SIZE] = "{\n\t\"name\":[\"apple\", 34, \"hello\"], \"tmp\": { \"Hello\":23 }, \"isman\": false\n}";
+static char buf[MAX_FILE_SIZE] = "{\n\t\"name\":[\"apple\", 34.4, \"hello\"], \"tmp\": { \"Hello\":23 }, \"isman\": false\n}";
 
 int main(void)
 {
@@ -19,6 +19,8 @@ int main(void)
 	{
 		jpush(toks, tok);
 	}
+
+	// jtoksprint(toks);
 
 	JItem *items = NULL;
 	items = jparse(toks);

@@ -14,15 +14,19 @@ void jprint(JItem *items)
 		switch (items[i].type)
 		{
 			case NIL:
+				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
 				printf("[TYPE: %10s]\n", "nil");
 				break;
 			case STRING:
+				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
 				printf("[TYPE: %10s]\t[VALUE: %s]\n", "string", items[i].value.str);
 				break;
 			case NUMBER:
+				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
 				printf("[TYPE: %10s]\t[VALUE: %lf]\n", "number", items[i].value.num);
 				break;
 			case BOOL:
+				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
 				printf("[TYPE: %10s]\t[VALUE: %s]\n", "bool", !items[i].value.boo ? "false" : "true");
 				break;
 			case OBJECT:
@@ -45,12 +49,10 @@ void jprint(JItem *items)
 
 JItem *jparse(JToken *toks)
 {
-	size_t j = 0;
 	JItem tmp = { 0 };
 	JItem *res = NULL;
 
 	bool issep = false;
-	char brack = *toks->str;
 	char begin = *toks->str;
 	char end;
 
@@ -81,10 +83,18 @@ JItem *jparse(JToken *toks)
 						return res;
 				}
 
-				for (j = i; j < jlen(toks); j++)
+				j = i + 1;
+
+				for (size_t k = 0; j < jlen(toks); j++)
 				{
 					if (toks[j].type == BRACKET &&
-						*toks[j].str == end)
+						*toks[j].str == begin)
+					{
+						k++;
+					}
+
+					if (toks[j].type == BRACKET &&
+						*toks[j].str == end && k-- == 0)
 					{
 						break;
 					}

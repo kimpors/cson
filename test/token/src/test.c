@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "test.h"
-#include "jarray.h"
 
 void jtokprint_test(JToken *restrict tok)
 {

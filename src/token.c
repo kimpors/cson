@@ -67,7 +67,8 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 			break;
 		default:
 			ps = s;
-			while (isalnum(*++ps));
+			while (isalnum(*++ps) || *ps == '.');
+			// while (*++ps != ',' && *ps != ']' && *ps != '}');
 
 			jinit(temp, (ps - s + 1));
 			jlen(temp) = (ps - s);
