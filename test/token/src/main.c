@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include "jarray.h"
 #include "test.h"
-#include "token.h"
+#include "jtoken.h"
 
 #define CSON_MAX_BUF	1024
 

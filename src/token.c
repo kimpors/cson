@@ -1,7 +1,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "token.h"
+#include "jtoken.h"
 #include "jarray.h"
 
 void jtokprint(JToken *restrict tok)

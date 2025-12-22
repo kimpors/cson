@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include "parse.h"
-#include "token.h"
+#include "jparse.h"
+#include "jtoken.h"
 
 void jitemprint(JItem *items)
 {

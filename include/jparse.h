@@ -1,5 +1,5 @@
 #pragma once
-#include "token.h"
+#include "jtoken.h"
 #include <stdbool.h>
 
 typedef enum {
