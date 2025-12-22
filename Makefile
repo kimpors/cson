@@ -1,16 +1,37 @@
 include config.mk
 
-.PHONY: install static shared compile token-test parse-test clean
+.PHONY: install-shared install-static install-include \
+	static shared compile token-test parse-test clean
 
 all: shared
-shared: $(BUILD) $(SHARED_TARGET)
-static: $(BUILD) $(STATIC_TARGET)
+test: token-test parse-test
+shared: $(BUILD) $(BUILD_SHARED_TARGET)
+static: $(BUILD) $(BUILD_STATIC_TARGET)
 
-$(STATIC_TARGET): $(OBJ)
+install-shared: shared install-include
+	mkdir -p ${DESTDIR}/lib
+	cp -f $(BUILD_SHARED_TARGET) ${DESTDIR}/lib
+	chmod 755 ${DESTDIR}/lib/$(SHARED_TARGET)
+
+install-static: static install-include
+	mkdir -p ${DESTDIR}/lib
+	cp -f $(BUILD_STATIC_TARGET) ${DESTDIR}/lib
+	chmod 755 ${DESTDIR}/lib/$(STATIC_TARGET)
+
+install-include:
+	mkdir -p ${DESTDIR}/include/$(TARGET)
+	cp -f include/* ${DESTDIR}/include/$(TARGET)
+	chmod 755 ${DESTDIR}/include/$(TARGET)
+
+uninstall:
+	rm -f ${DESTDIR}/lib/$(TARGET).*
+	rm -rf $(DESTDIR)/include/$(TARGET)
+
+$(BUILD_STATIC_TARGET): $(OBJ)
 	@echo "Building static library to $@"
-	@ar -rcs $(STATIC_TARGET) $(OBJ)
+	@ar -rcs $(BUILD_STATIC_TARGET) $(OBJ)
 
-$(SHARED_TARGET): $(SRC)
+$(BUILD_SHARED_TARGET): $(SRC)
 	@echo "Building shared library to $@"
 	@gcc -shared -fPIC -Iinclude -o $@ $^
 
@@ -25,8 +46,6 @@ $(BUILD):
 	fi
 
 compile: $(BUILD)/compile_commands.json
-
-test: token-test parse-test
 
 token-test:
 	@echo "token test"
