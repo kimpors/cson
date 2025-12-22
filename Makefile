@@ -1,17 +1,8 @@
-SHELL := /bin/bash
+include config.mk
 
-CC = gcc
-BUILD = build
-SRC = $(wildcard src/*.c)
-OBJ = $(addprefix $(BUILD)/, $(notdir $(addsuffix .o, $(basename $(wildcard src/*c)))))
-TARGET = $(BUILD)/cson
-STATIC_TARGET = $(TARGET).a
-SHARED_TARGET = $(TARGET).so
-CFLAGS += -Iinclude
-MAKEFLAGS += --no-print-directory
+.PHONY: install static shared compile token-test parse-test clean
 
-.PHONY: static shared compile token-test parse-test clean
-
+all: shared
 shared: $(BUILD) $(SHARED_TARGET)
 static: $(BUILD) $(STATIC_TARGET)
 
@@ -39,11 +30,11 @@ test: token-test parse-test
 
 token-test:
 	@echo "token test"
-	@cd test/token && $(MAKE)
+	@$(MAKE) -C test/token CONFIG_PATH=$(shell pwd)/config.mk
 
 parse-test:
 	@echo "parse test"
-	@cd test/parse && $(MAKE)
+	@$(MAKE) -C test/parse CONFIG_PATH=$(shell pwd)/config.mk
 
 $(BUILD)/compile_commands.json: $(BUILD)
 	echo -e '[{"directory": "$(shell pwd)",' 	\

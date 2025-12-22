@@ -1,11 +1,7 @@
-SHELL := /bin/bash
+include $(CONFIG_PATH)
 
-CC = gcc
-BUILD = build
 SRC = src/main.c src/parse.c src/token.c src/test.c
 TARGET := $(BUILD)/test
-CFLAGS += -Iinclude
-DBFLAGS += -g
 
 all-tests := $(addsuffix .test, $(basename $(wildcard example/*.in)))
 
