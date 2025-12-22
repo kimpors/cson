@@ -1,9 +1,10 @@
 SHELL := /bin/bash
 
 CC = gcc
+BUILD = build
 SRC = $(wildcard src/*.c)
-OBJ = $(addprefix build/, $(notdir $(addsuffix .o, $(basename $(wildcard src/*c)))))
-TARGET = build/cson
+OBJ = $(addprefix $(BUILD)/, $(notdir $(addsuffix .o, $(basename $(wildcard src/*c)))))
+TARGET = $(BUILD)/cson
 STATIC_TARGET = $(TARGET).a
 SHARED_TARGET = $(TARGET).so
 CFLAGS += -Iinclude
@@ -11,8 +12,8 @@ MAKEFLAGS += --no-print-directory
 
 .PHONY: static shared compile token-test parse-test clean
 
-shared: $(SHARED_TARGET)
-static: $(STATIC_TARGET)
+shared: $(BUILD) $(SHARED_TARGET)
+static: $(BUILD) $(STATIC_TARGET)
 
 $(STATIC_TARGET): $(OBJ)
 	@echo "Building static library to $@"
@@ -26,7 +27,13 @@ $(OBJ): $(SRC)
 	@echo "Compiling object file to $@"
 	@$(CC) -c $(CFLAGS) $(addprefix src/, $(notdir $(basename $@))).c -o $@
 
-compile: build/compile_commands.json
+$(BUILD):
+	@echo "Creating build directory"
+	@if [ ! -d "./$(BUILD)" ]; then \
+		mkdir $(BUILD); \
+	fi
+
+compile: $(BUILD)/compile_commands.json
 
 test: token-test parse-test
 
@@ -38,11 +45,11 @@ parse-test:
 	@echo "parse test"
 	@cd test/parse && $(MAKE)
 
-build/compile_commands.json:
+$(BUILD)/compile_commands.json: $(BUILD)
 	echo -e '[{"directory": "$(shell pwd)",' 	\
 		'"command": "/usr/bin/cc src/main.c src/token.c -o'  \
-		'build/cson -I$(shell pwd)/include",'	\
-		'"file": "src/main.c"}]' > build/compile_commands.json
+		'$(BUILD)/cson -I$(shell pwd)/include",'	\
+		'"file": "src/main.c"}]' > $(BUILD)/compile_commands.json
 
 clean:
-	@rm -f build/cson.*
+	@rm -f $(BUILD)/cson.*
