@@ -38,13 +38,15 @@ int main(int argc, char *argv[])
 	JToken tok = { 0 };
 	JToken *toks = NULL;
 
-	while ((ps = jtokget(&tok, ps, CSON_MAX_BUF)))
-	{
-		jpush(toks, tok);
-	}
+	toks = jtokenizeall(ps, CSON_MAX_BUF);
+
+	// while ((ps = jtokget(&tok, ps, CSON_MAX_BUF)))
+	// {
+	// 	jpush(toks, tok);
+	// }
 
 	JItem *items = NULL;
-	items = jparse(toks);
+	items = jitemparse(toks);
 
 	jprint_test(items);
 

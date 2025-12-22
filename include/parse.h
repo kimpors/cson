@@ -21,5 +21,5 @@ typedef struct jitem {
 	} value;
 } JItem;
 
-void jprint(JItem *items);
-JItem *jparse(JToken *toks);
+void jitemprint(JItem *items);
+JItem *jitemparse(JToken *toks);

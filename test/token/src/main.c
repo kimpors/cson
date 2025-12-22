@@ -35,12 +35,9 @@ int main(int argc, char *argv[])
 
 	char *ps = buf;
 	JToken tok = { 0 };
-	JToken *toks = NULL;
 
-	while ((ps = jtokget(&tok, ps, CSON_MAX_BUF)))
-	{
-		jpush(toks, tok);
-	}
+	JToken *toks = NULL;
+	toks = jtokenizeall(ps, CSON_MAX_BUF);
 
 	for (size_t i = 0; i < jlen(toks); i++)
 	{

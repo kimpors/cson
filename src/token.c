@@ -23,7 +23,7 @@ void jtokprint(JToken *restrict tok)
 	}
 }
 
-char *jtokget(JToken *dest, char *s, size_t lim)
+char *jtokenize(JToken *dest, char *s, size_t lim)
 {
 	if (!s || !*s) return NULL;
 	while (lim-- > 0 && isspace(*s)) s++;
@@ -68,7 +68,6 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 		default:
 			ps = s;
 			while (isalnum(*++ps) || *ps == '.');
-			// while (*++ps != ',' && *ps != ']' && *ps != '}');
 
 			jinit(temp, (ps - s + 1));
 			jlen(temp) = (ps - s);
@@ -83,7 +82,20 @@ char *jtokget(JToken *dest, char *s, size_t lim)
 	return s;
 }
 
-void jtoksprint(JToken *toks)
+JToken *jtokenizeall(char *s, size_t lim)
+{
+	JToken tmp = { 0 };
+	JToken *toks = NULL;
+
+	while ((s = jtokenize(&tmp, s, lim)))
+	{
+		jpush(toks, tmp);
+	}
+
+	return toks;
+}
+
+void jtokprintall(JToken *toks)
 {
 	printf("[SIZE: %4ld][CAPACITY: %4ld]\n", jlen(toks), jcap(toks));
 	printf("====================================\n");

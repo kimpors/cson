@@ -7,7 +7,7 @@
 #include "parse.h"
 #include "token.h"
 
-void jprint(JItem *items)
+void jitemprint(JItem *items)
 {
 	for (size_t i = 0; i < jlen(items); i++)
 	{
@@ -33,21 +33,21 @@ void jprint(JItem *items)
 				printf("[KEY: %10s]\t", items[i].key);
 				printf("[TYPE: %10s]\n", "object");
 				puts("[OBJECT BEGIN]");
-				jprint(items[i].value.arr);
+				jitemprint(items[i].value.arr);
 				puts("[OBJECT END]");
 				break;
 			case ARRAY:
 				printf("[KEY: %10s]\t", items[i].key);
 				printf("[TYPE: %10s]\n", "array");
 				puts("[ARRAY BEGIN]");
-				jprint(items[i].value.arr);
+				jitemprint(items[i].value.arr);
 				puts("[ARRAY END]");
 				break;
 			}
         }
 }
 
-JItem *jparse(JToken *toks)
+JItem *jitemparse(JToken *toks)
 {
 	JItem tmp = { 0 };
 	JItem *res = NULL;
@@ -104,11 +104,11 @@ JItem *jparse(JToken *toks)
 				{
 					case '}':
 						tmp.type = OBJECT;
-						tmp.value.arr = jparse(toks + i);
+						tmp.value.arr = jitemparse(toks + i);
 						break;
 					case ']':
 						tmp.type = ARRAY;
-						tmp.value.arr = jparse(toks + i);
+						tmp.value.arr = jitemparse(toks + i);
 						break;
 				}
 

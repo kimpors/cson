@@ -6,11 +6,13 @@ typedef enum {
 	COMA, SEPARATOR
 } JTokenType;
 
-typedef struct {
+typedef struct jtok {
 	char *str;
 	JTokenType type;
 } JToken;
 
-void jtoksprint(JToken *toks);
 void jtokprint(JToken *restrict tok);
-char *jtokget(JToken *dest, char *s, size_t lim);
+void jtokprintall(JToken *toks);
+
+char *jtokenize(JToken *dest, char *s, size_t lim);
+JToken *jtokenizeall(char *s, size_t lim);
