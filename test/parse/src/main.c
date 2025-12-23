@@ -40,10 +40,7 @@ int main(int argc, char *argv[])
 
 	toks = jtokenizeall(ps, CSON_MAX_BUF);
 
-	// while ((ps = jtokget(&tok, ps, CSON_MAX_BUF)))
-	// {
-	// 	jpush(toks, tok);
-	// }
+	if (!toks) return 0;
 
 	JItem *items = NULL;
 	items = jitemparse(toks);

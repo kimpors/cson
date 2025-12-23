@@ -13,7 +13,7 @@ all: $(BUILD) $(TARGET) $(all-tests)
 compile: $(BUILD) $(BUILD)/compile_commands.json
 
 example/%.test: example/%.in example/%.cmp
-	@$(TARGET) $< 2>&1 | diff  $(word 2, $?) - || \
+	@$(TARGET) $< 2>&1 | diff $(word 2, $?) - || \
 		(echo 'Test $@ failed' && exit 1)
 
 $(TARGET): $(SRC)

@@ -1,11 +1,18 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "jerror.h"
 #include "jtoken.h"
 #include "jarray.h"
 
 void jtokprint(JToken *restrict tok)
 {
+	if (!tok) 
+	{
+		JERROR_MSG("'tok' is unintilized");
+		return;
+	}
+
 	switch (tok->type)
 	{
 		case BRACKET:
@@ -19,6 +26,9 @@ void jtokprint(JToken *restrict tok)
 			break;
 		case VALUE:
 			printf("[TYPE: %9s]\t[VALUE: '%s']\n", "value", (char *)tok->str);
+			break;
+		default:
+			JWARN_MSG("'tok' type is not specified (type: %u, value: %s)", tok->type, tok->str);
 			break;
 	}
 }
@@ -84,6 +94,8 @@ char *jtokenize(JToken *dest, char *s, size_t lim)
 
 JToken *jtokenizeall(char *s, size_t lim)
 {
+	if (!s || !*s) return NULL;
+
 	JToken tmp = { 0 };
 	JToken *toks = NULL;
 
@@ -97,6 +109,12 @@ JToken *jtokenizeall(char *s, size_t lim)
 
 void jtokprintall(JToken *toks)
 {
+	if (!toks) 
+	{
+		JERROR_MSG("'toks' is uninitilized");
+		return;
+	}
+
 	printf("[SIZE: %4ld][CAPACITY: %4ld]\n", jlen(toks), jcap(toks));
 	printf("====================================\n");
 

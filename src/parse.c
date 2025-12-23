@@ -1,33 +1,41 @@
 #include <stdio.h>
-#include "jarray.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+
+#include "jarray.h"
+#include "jerror.h"
 #include "jparse.h"
 #include "jtoken.h"
 
 void jitemprint(JItem *items)
 {
+	if (!items) 
+	{
+		JERROR_MSG("'items' is uninitilized");
+		return;
+	}
+
 	for (size_t i = 0; i < jlen(items); i++)
 	{
 		switch (items[i].type)
 		{
 			case NIL:
 				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
-				printf("[TYPE: %10s]\n", "nil");
+				else printf("[TYPE: %10s]\n", "nil");
 				break;
 			case STRING:
 				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
-				printf("[TYPE: %10s]\t[VALUE: %s]\n", "string", items[i].value.str);
+				else printf("[TYPE: %10s]\t[VALUE: %s]\n", "string", items[i].value.str);
 				break;
 			case NUMBER:
 				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
-				printf("[TYPE: %10s]\t[VALUE: %lf]\n", "number", items[i].value.num);
+				else printf("[TYPE: %10s]\t[VALUE: %lf]\n", "number", items[i].value.num);
 				break;
 			case BOOL:
 				if (items[i].key) printf("[KEY: %10s]\t", items[i].key);
-				printf("[TYPE: %10s]\t[VALUE: %s]\n", "bool", !items[i].value.boo ? "false" : "true");
+				else printf("[TYPE: %10s]\t[VALUE: %s]\n", "bool", !items[i].value.boo ? "false" : "true");
 				break;
 			case OBJECT:
 				printf("[KEY: %10s]\t", items[i].key);
@@ -43,12 +51,21 @@ void jitemprint(JItem *items)
 				jitemprint(items[i].value.arr);
 				puts("[ARRAY END]");
 				break;
+			default:
+				JWARN_MSG("'items[i]' is not specified (type: %u, value: %.2f)", items[i].type, items[i].value.num);
+				break;
 			}
         }
 }
 
 JItem *jitemparse(JToken *toks)
 {
+	if (!toks) 
+	{
+		JERROR_MSG("'toks' is unitilized");
+		return NULL;
+	}
+
 	JItem tmp = { 0 };
 	JItem *res = NULL;
 
