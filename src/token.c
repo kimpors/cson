@@ -40,17 +40,12 @@ char *jtokenize(JToken *dest, char *s, size_t lim)
 	if (!*s) return NULL;
 
 	char *ps;
-	char *temp = NULL;
 	switch (*s)
 	{
 		case '{': case '}':
 		case '[': case ']':
-			jinit(temp, 2);
-			jlen(temp) = 1;
-			temp[0] = s[0];
-			temp[1] = '\0';
-
-			dest->str = temp;
+			dest->str = NULL;
+			jstrncpy(dest->str, s, 1);
 			dest->type = BRACKET;
 			s++;
 			break;
@@ -66,12 +61,8 @@ char *jtokenize(JToken *dest, char *s, size_t lim)
 			ps = s;
 			while (*ps != '\0' && *++ps != '"');
 
-			jinit(temp, (ps - s + 1));
-			jlen(temp) = (ps - s);
-			strncpy(temp, s, ps - s);
-			temp[ps - s] = '\0';
-
-			dest->str = temp;
+			dest->str = NULL;
+			jstrncpy(dest->str, s, (ps - s));
 			dest->type = VALUE;
 			s = ps + 1;
 			break;
@@ -79,13 +70,9 @@ char *jtokenize(JToken *dest, char *s, size_t lim)
 			ps = s;
 			while (isalnum(*++ps) || *ps == '.');
 
-			jinit(temp, (ps - s + 1));
-			jlen(temp) = (ps - s);
-			strncpy(temp, s, ps - s);
-			temp[ps - s] = '\0';
-
+			dest->str = NULL;
+			jstrncpy(dest->str, s, (ps - s));
 			dest->type = VALUE;
-			dest->str = temp;
 			s = ps;
 			break;
 	}

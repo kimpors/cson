@@ -52,3 +52,32 @@ typedef struct {
 								fprintf(stderr, "error: Can't init array in 'jpush'\n"); \
 							} \
 						} 
+
+#define jstrncpy(arr, str, lim) { \
+						size_t len = strlen(str); \
+						len = len > lim ? lim : len; \
+						if (arr) { \
+							if (len < jcap(arr)) { \
+								jlen(arr) = len; \
+								strncpy(arr, str, jlen(arr)); \
+								arr[jlen(arr)] = '\0'; \
+							} else if ((arr = realloc(jheader(arr), sizeof(Header) + sizeof(*arr) * jcap(arr) * len * 2))) { \
+								arr = (void *)((char *)arr + sizeof(Header)); \
+								jcap(arr) = jcap(arr) * len * 2; \
+								jlen(arr) = len; \
+								strncpy(arr, str, jlen(arr)); \
+								arr[jlen(arr)] = '\0'; \
+							} else { \
+								fprintf(stderr, "error: Can't expan array in 'jpush'\n"); \
+							}\
+						} else {\
+							if ((arr = malloc(sizeof(Header) + sizeof(*arr) * len * 2))) { \
+								arr = (void *)((char *)arr + sizeof(Header)); \
+								jcap(arr) = len * 2; \
+								jlen(arr) = len; \
+								strncpy(arr, str, jlen(arr)); \
+								arr[jlen(arr)] = '\0'; \
+							} else {\
+								fprintf(stderr, "error: Can't init array in 'jpush'\n"); \
+							} \
+						}} 

@@ -140,10 +140,7 @@ JItem *jitemparse(JToken *toks)
 
 				if (*toks[i].str == '"')
 				{
-					jinit(tmp.value.str, jlen(toks[i].str));
-					jlen(tmp.value.str) = jlen(toks[i].str) - 1;
-					strncpy(tmp.value.str, toks[i].str + 1, jlen(toks[i].str) - 1);
-					tmp.value.str[jlen(tmp.value.str)] = '\0';
+					jstrncpy(tmp.value.str, toks[i].str + 1, jlen(toks[i].str) - 1)
 					tmp.type = STRING;
 				}
 				else if (isdigit(*toks[i].str))
