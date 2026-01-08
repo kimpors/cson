@@ -12,7 +12,7 @@ typedef struct {
 #define jcap(a)		(jheader(a)->cap) 
 #define jfree(arr)	free(jheader(arr))
 
-#define jinit(arr, cap) if (cap) { \
+#define jinit(arr, cap) {if (cap) { \
 							if ((arr = malloc(sizeof(Header) + sizeof(*arr) * cap))) { \
 								arr = (void *)((char *)arr + sizeof(Header)); \
 								jlen(arr) = 0; \
@@ -20,92 +20,69 @@ typedef struct {
 							} else {\
 									fprintf(stderr, "error: Cant init array in 'jinit'\n"); \
 							} \
-						}
+						}}
 
-#define jexpand(arr, cap)	if (arr && cap && cap > jcap(arr)) { \
+#define jexpand(arr, cap) { if (arr && cap && cap > jcap(arr)) { \
 								if ((arr = realloc(jheader(arr), sizeof(Header) + sizeof(*arr) * cap))) { \
 									arr = (void *)((char *)arr + sizeof(Header)); \
 									jcap(arr) = cap; \
 								} else { \
 									fprintf(stderr, "error: Can't expand array in 'jexpand'\n"); \
 								} \
-							}
-
+							}}
 
 #define jpush(arr, val)	if (arr) { \
 							if (jlen(arr) + 1 < jcap(arr)) { \
 								arr[jlen(arr)++] = val; \
-							} else if ((arr = realloc(jheader(arr), sizeof(Header) + sizeof(*arr) * jcap(arr) * 2))) { \
-								arr = (void *)((char *)arr + sizeof(Header)); \
-								jcap(arr) = jcap(arr) * 2; \
-								arr[jlen(arr)++] = val; \
 							} else { \
-								fprintf(stderr, "error: Can't expan array in 'jpush'\n"); \
+								jexpand(arr, jcap(arr) * 2); \
+								arr[jlen(arr)++] = val; \
 							}\
 						} else {\
-							if ((arr = malloc(sizeof(Header) + sizeof(*arr) * 2))) { \
-								arr = (void *)((char *)arr + sizeof(Header)); \
-								jcap(arr) = 2; \
-								jlen(arr) = 0; \
-								arr[jlen(arr)++] = val; \
-							} else {\
-								fprintf(stderr, "error: Can't init array in 'jpush'\n"); \
-							} \
+							jinit(arr, 2); \
+							jlen(arr) = 0; \
+							arr[jlen(arr)++] = val; \
 						} 
 
-#define jstrncpy(arr, str, lim) { \
-						size_t len = strlen(str); \
-						len = len > lim ? lim : len; \
+#define jstrncpy(arr, str, lim) \
 						if (arr) { \
+							size_t len = strlen(str); \
+							len = len > lim ? lim : len; \
 							if (len < jcap(arr)) { \
 								jlen(arr) = len; \
 								strncpy(arr, str, jlen(arr)); \
 								arr[jlen(arr)] = '\0'; \
-							} else if ((arr = realloc(jheader(arr), sizeof(Header) + sizeof(*arr) * jcap(arr) * len * 2))) { \
-								arr = (void *)((char *)arr + sizeof(Header)); \
-								jcap(arr) = jcap(arr) * len * 2; \
-								jlen(arr) = len; \
-								strncpy(arr, str, jlen(arr)); \
-								arr[jlen(arr)] = '\0'; \
 							} else { \
-								fprintf(stderr, "error: Can't expan array in 'jpush'\n"); \
-							}\
-						} else {\
-							if ((arr = malloc(sizeof(Header) + sizeof(*arr) * len * 2))) { \
-								arr = (void *)((char *)arr + sizeof(Header)); \
-								jcap(arr) = len * 2; \
+								jexpand(arr, (jcap(arr) + (len * 2))); \
 								jlen(arr) = len; \
 								strncpy(arr, str, jlen(arr)); \
 								arr[jlen(arr)] = '\0'; \
-							} else {\
-								fprintf(stderr, "error: Can't init array in 'jpush'\n"); \
 							} \
-						}} 
+						} else { \
+							size_t len = strlen(str); \
+							len = len > lim ? lim : len; \
+							jinit(arr, (len * 2)); \
+							jlen(arr) = len; \
+							strncpy(arr, str, jlen(arr)); \
+							arr[jlen(arr)] = '\0'; \
+						}
 
-#define jconcat(arr, str) { \
-						size_t len = strlen(str); \
-						if (arr) { \
+#define jconcat(arr, str)  if (arr) { \
+							size_t len = strlen(str); \
 							if (jlen(arr) + len < jcap(arr)) { \
 								strcat(arr, str); \
 								jlen(arr) += len; \
 								arr[jlen(arr)] = '\0'; \
-							} else if ((arr = realloc(jheader(arr), sizeof(Header) + sizeof(*arr) * jcap(arr) * len * 2))) { \
-								arr = (void *)((char *)arr + sizeof(Header)); \
-								jcap(arr) = jcap(arr) * len * 2; \
-								strcat(arr, str); \
-								jlen(arr) += len; \
-								arr[jlen(arr)] = '\0'; \
-							} else { \
-								fprintf(stderr, "error: Can't expan array in 'jpush'\n"); \
-							}\
-						} else {\
-							if ((arr = malloc(sizeof(Header) + sizeof(*arr) * len * 2))) { \
-								arr = (void *)((char *)arr + sizeof(Header)); \
-								jcap(arr) = len * 2; \
-								jlen(arr) = len; \
-								strcat(arr, str); \
-								arr[jlen(arr)] = '\0'; \
 							} else {\
-								fprintf(stderr, "error: Can't init array in 'jpush'\n"); \
+								jexpand(arr, ((jcap(arr) + len) * 2)); \
+								jlen(arr) += len; \
+								strcat(arr, str); \
+								arr[jlen(arr)] = '\0'; \
 							} \
-						}} 
+						} else { \
+							size_t len = strlen(str); \
+							jinit(arr, (len * 2)); \
+							jlen(arr) = len; \
+							strcat(arr, str); \
+							arr[jlen(arr)] = '\0'; \
+						}
