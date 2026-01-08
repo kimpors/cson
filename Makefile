@@ -4,7 +4,7 @@ include config.mk
 	static shared compile token-test parse-test clean
 
 all: shared
-test: token-test parse-test
+test: token-test parse-test parse-to-json-test
 shared: $(BUILD) $(BUILD_SHARED_TARGET)
 static: $(BUILD) $(BUILD_STATIC_TARGET)
 
@@ -54,6 +54,10 @@ token-test:
 parse-test:
 	@echo "parse test"
 	@$(MAKE) -C test/parse CONFIG_PATH=$(shell pwd)/config.mk
+
+parse-to-json-test:
+	@echo "parse test"
+	@$(MAKE) -C test/parse-to-json CONFIG_PATH=$(shell pwd)/config.mk
 
 $(BUILD)/compile_commands.json: $(BUILD)
 	echo -e '[{"directory": "$(shell pwd)",' 	\
