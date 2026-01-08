@@ -13,8 +13,8 @@ STATIC_TARGET = $(TARGET).a
 SHARED_TARGET = $(TARGET).so
 
 CC = gcc
-DBFLAGS += -g
-CFLAGS += -Iinclude
+DBFLAGS += -gdwarf-2 -g3
+CFLAGS += -Iinclude -lm
 MAKEFLAGS += --no-print-directory
 
 # install path

@@ -23,3 +23,4 @@ typedef struct jitem {
 
 void jitemprint(JItem *items);
 JItem *jitemparse(JToken *toks);
+char *jitemtojson(JItem *items, size_t tabs, bool strip);

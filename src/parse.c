@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
@@ -140,7 +141,7 @@ JItem *jitemparse(JToken *toks)
 
 				if (*toks[i].str == '"')
 				{
-					jstrncpy(tmp.value.str, toks[i].str + 1, jlen(toks[i].str) - 1)
+					jstrncpy(tmp.value.str, toks[i].str + 1, jlen(toks[i].str) - 1);
 					tmp.type = STRING;
 				}
 				else if (isdigit(*toks[i].str))
@@ -165,6 +166,88 @@ JItem *jitemparse(JToken *toks)
 				}
 				break;
 		}
+	}
+
+	return res;
+}
+
+char *jitemtojson(JItem *items, size_t tabs, bool strip)
+{
+	if (!items) return NULL;
+
+	char sbuf[20];
+	char *res = NULL, *tmp = NULL;
+
+	if (!items->key) 
+	{
+		jconcat(res, "[");
+	}
+	else 
+	{
+		jconcat(res, "{"); 
+	}
+
+	if (!strip && items->key != NULL) { jconcat(res, "\n"); }
+
+	for (size_t i = 0; i < jlen(items); i++)
+	{
+		if (items->key)
+		{
+			for (size_t j = 0; j < tabs; j++)
+			{
+				jconcat(res, "\t");
+			}
+
+			jconcat(res, "\t\"");
+			jconcat(res, items[i].key);
+			jconcat(res, "\"");
+
+			if (strip) { jconcat(res, ":"); }
+			else { jconcat(res, " : "); }
+		}
+
+		switch(items[i].type)
+		{
+			case NIL:
+				jconcat(res, "null");
+				break;
+			case STRING:
+				jconcat(res, "\"");
+				jconcat(res, items[i].value.str);
+				jconcat(res, "\"");
+				break;
+			case NUMBER:
+				if (items[i].value.num == trunc(items[i].value.num)) sprintf(sbuf, "%.0f", items[i].value.num);
+				else sprintf(sbuf, "%.1f", items[i].value.num);
+				jconcat(res, sbuf);
+				break;
+			case BOOL:
+				jconcat(res, items[i].value.boo ? "true" : "false");
+				break;
+			case ARRAY:
+			case OBJECT:
+				tmp = jitemtojson(items[i].value.arr, tabs + 1, strip);
+				jconcat(res, tmp);
+				jfree(tmp);
+				tmp = NULL;
+			  break;
+        }
+
+		if (!strip && !items->key && i < jlen(items) - 1) { jconcat(res, ", "); }
+		else if (i < jlen(items) - 1) { jconcat(res, ","); }
+
+		if (!strip && items->key != NULL) { jconcat(res, "\n"); }
+	}
+
+	if (!items->key) { jconcat(res, "]"); }
+	else 
+	{
+		for (size_t j = 0; j < tabs; j++)
+		{
+			jconcat(res, "\t");
+		}
+
+		jconcat(res, "}"); 
 	}
 
 	return res;
