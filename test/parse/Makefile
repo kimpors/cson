@@ -1,6 +1,8 @@
 include $(CONFIG_PATH)
 
-SRC = src/main.c src/parse.c src/token.c src/test.c
+CFLAGS += -I$(ABS_INCLUDE)
+
+SRC = src/main.c src/test.c $(ABS_SRC)
 TARGET := $(BUILD)/test
 
 all-tests := $(addsuffix .test, $(basename $(wildcard example/*.in)))
