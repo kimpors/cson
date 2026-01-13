@@ -1,10 +1,13 @@
 include config.mk
 
+ABS_SRC = $(abspath src/*.c)
+ABS_INCLUDE = $(abspath include)
+
 .PHONY: install-shared install-static install-include \
 	static shared compile token-test parse-test clean
 
 all: shared
-test: token-test parse-test parse-to-json-test
+test: token-to-json-test parse-to-json-test token-test parse-test 
 shared: $(BUILD) $(BUILD_SHARED_TARGET)
 static: $(BUILD) $(BUILD_STATIC_TARGET)
 
@@ -49,15 +52,19 @@ compile: $(BUILD)/compile_commands.json
 
 token-test:
 	@echo "token test"
-	@$(MAKE) -C test/token CONFIG_PATH=$(shell pwd)/config.mk
+	@$(MAKE) -C test/token CONFIG_PATH=$(shell pwd)/config.mk ABS_SRC=$(ABS_SRC) ABS_INCLUDE=$(ABS_INCLUDE)
+
+token-to-json-test:
+	@echo "token to json test"
+	@$(MAKE) -C test/token-to-json CONFIG_PATH=$(shell pwd)/config.mk ABS_SRC=$(ABS_SRC) ABS_INCLUDE=$(ABS_INCLUDE)
 
 parse-test:
 	@echo "parse test"
-	@$(MAKE) -C test/parse CONFIG_PATH=$(shell pwd)/config.mk
+	@$(MAKE) -C test/parse CONFIG_PATH=$(shell pwd)/config.mk ABS_SRC=$(ABS_SRC) ABS_INCLUDE=$(ABS_INCLUDE)
 
 parse-to-json-test:
 	@echo "parse test"
-	@$(MAKE) -C test/parse-to-json CONFIG_PATH=$(shell pwd)/config.mk
+	@$(MAKE) -C test/parse-to-json CONFIG_PATH=$(shell pwd)/config.mk ABS_SRC=$(ABS_SRC) ABS_INCLUDE=$(ABS_INCLUDE)
 
 $(BUILD)/compile_commands.json: $(BUILD)
 	echo -e '[{"directory": "$(shell pwd)",' 	\

@@ -17,8 +17,5 @@ DBFLAGS += -gdwarf-2 -g3
 CFLAGS += -Iinclude -lm
 MAKEFLAGS += --no-print-directory
 
-ABS_SRC = $(abspath src/*.c)
-ABS_INCLUDE = $(abspath include)
-
 # install path
 DESTDIR = /usr/local
