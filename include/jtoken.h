@@ -1,5 +1,6 @@
 #pragma once
-#include "stdlib.h"
+#include <stdlib.h>
+#include <stdbool.h>
 
 typedef enum {
 	VALUE, BRACKET,
@@ -16,3 +17,4 @@ void jtokprintall(JToken *toks);
 
 char *jtokenize(JToken *dest, char *s, size_t lim);
 JToken *jtokenizeall(char *s, size_t lim);
+char *jtoktojson(JToken *toks, bool strip);
