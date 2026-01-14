@@ -1,18 +1,15 @@
-include $(CONFIG_PATH)
+include ../../config.mk
 
-CFLAGS += -I$(ABS_INCLUDE)
-
-SRC = src/main.c src/test.c $(ABS_SRC)
+SRC := src/main.c src/test.c $(ABS_SRC)
+CFLAGS += -I$(ABS_INC)
 TARGET := $(BUILD)/test
 
 all-tests := $(addsuffix .test, $(basename $(wildcard example/*.in)))
 
-.PHONY : all test %.test clean
+.PHONY : all test %.test
 
 all: $(BUILD) $(TARGET) $(all-tests)
 	@echo "Success, all test passed."
-
-compile: $(BUILD) $(BUILD)/compile_commands.json
 
 example/%.test: example/%.in example/%.cmp
 	@$(TARGET) $< 2>&1 | diff $(word 2, $?) - || \
@@ -20,17 +17,3 @@ example/%.test: example/%.in example/%.cmp
 
 $(TARGET): $(SRC)
 	$(CC) $(SRC) -o $(TARGET) $(CFLAGS) $(DBFLAGS)
-
-$(BUILD):
-	@echo "Creating build directory"
-	@if [ ! -d "./$(BUILD)" ]; then \
-		mkdir $(BUILD); \
-	fi
-
-$(BUILD)/compile_commands.json:
-	echo -e '[{"directory": "$(shell pwd)",' 	\
-		'"command": "/usr/bin/cc src/main.c src/token.c -o'  \
-		'$(BUILD)/cson -I$(shell pwd)/include",'	\
-		'"file": "src/main.c"}]' > $(BUILD)/compile_commands.json
-clean:
-	rm -f $(BUILD)/test

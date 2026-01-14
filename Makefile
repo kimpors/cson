@@ -1,13 +1,13 @@
 include config.mk
 
 .PHONY: all test install-shared install-static install-include \
-	static shared compile clean
+	static shared 
 
 all: shared
 test:
 	@for test in $(if $(args),$(args),$(TESTS)) ; do \
 		echo "test $$test" ; \
-		$(MAKE) -C test/$$test CONFIG_PATH=$(shell pwd)/config.mk ; \
+		$(MAKE) -C test/$$test ; \
 	done
 
 shared: $(BUILD) $(BUILD_SHARED_TARGET)
@@ -43,20 +43,3 @@ $(BUILD_SHARED_TARGET): $(SRC)
 $(OBJ): $(SRC)
 	@echo "Compiling object file to $@"
 	@$(CC) -c $(CFLAGS) $(addprefix src/, $(notdir $(basename $@))).c -o $@
-
-$(BUILD):
-	@echo "Creating build directory"
-	@if [ ! -d "./$(BUILD)" ]; then \
-		mkdir $(BUILD); \
-	fi
-
-compile: $(BUILD)/compile_commands.json
-
-$(BUILD)/compile_commands.json: $(BUILD)
-	echo -e '[{"directory": "$(shell pwd)",' 	\
-		'"command": "/usr/bin/cc src/main.c src/token.c -o'  \
-		'$(BUILD)/cson -I$(shell pwd)/include",'	\
-		'"file": "src/main.c"}]' > $(BUILD)/compile_commands.json
-
-clean:
-	@rm -f $(BUILD)/cson.*
