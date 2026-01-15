@@ -3,9 +3,6 @@ SHELL := /bin/bash
 .PHONY: clean compile
 .DEFAULT_GOAL = all
 
-SRC = $(wildcard src/*.c)
-OBJ := $(addprefix $(BUILD)/, $(notdir $(addsuffix .o, $(basename $(wildcard src/*c)))))
-
 TESTS = token-to-json parse-to-json token parse 
 ABS_SRC := $(subst /config.mk,,$(abspath $(lastword $(MAKEFILE_LIST))))/src/*.c
 ABS_INC := $(subst /config.mk,,$(abspath $(lastword $(MAKEFILE_LIST))))/include
@@ -14,6 +11,9 @@ BUILD := build
 BUILD_TARGET := $(BUILD)/cson
 BUILD_STATIC_TARGET := $(BUILD_TARGET).a
 BUILD_SHARED_TARGET := $(BUILD_TARGET).so
+
+SRC = $(wildcard src/*.c)
+OBJ := $(addprefix $(BUILD)/, $(notdir $(addsuffix .o, $(basename $(wildcard src/*c)))))
 
 TARGET := cson
 STATIC_TARGET := $(TARGET).a
