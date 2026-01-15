@@ -1,4 +1,7 @@
-id - 1.00
-employee - {name - "John"
-age - 34.00
+{
+	"id" : 1,
+	"employee" : {
+		"name" : "John",
+		"age" : 34
+	}
 }

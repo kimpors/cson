@@ -1,2 +1,4 @@
-{"name:"John,
-"age:34}
+{
+	"name" : "John",
+	"age" : 34
+}

@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "jarray.h"
-#include "test.h"
 #include "jtoken.h"
 #include "jparse.h"
 
@@ -45,7 +44,9 @@ int main(int argc, char *argv[])
 	JItem *items = NULL;
 	items = jitemparse(toks);
 
-	jprint_test(items);
+	char *res = NULL;
+	res = jitemtojson(items, 0, false);
+	printf("%s\n", res);
 
 	jfree(items);
 	jfree(toks);

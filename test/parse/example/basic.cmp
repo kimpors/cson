@@ -1,2 +1,4 @@
-name - "John"
-age - 34.00
+{
+	"name" : "John",
+	"age" : 34
+}

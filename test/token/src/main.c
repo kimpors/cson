@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include "jarray.h"
-#include "test.h"
+#include "jparse.h"
 #include "jtoken.h"
 
 #define CSON_MAX_BUF	1024
@@ -34,17 +34,19 @@ int main(int argc, char *argv[])
 	fclose(fp);
 
 	char *ps = buf;
-	JToken tok = { 0 };
 
 	JToken *toks = NULL;
 	toks = jtokenizeall(ps, CSON_MAX_BUF);
 
-	for (size_t i = 0; i < jlen(toks); i++)
-	{
-		jtokprint_test(&toks[i]);
-	}
+	JItem *items = NULL;
+	items = jitemparse(toks);
 
-	putchar('\n');
+	char *res = NULL;
+	res = jitemtojson(items, 0, false);
+	printf("%s\n", res);
+
+	jfree(res);
+	jfree(items);
 	jfree(toks);
 	return 0;
 }

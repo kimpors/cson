@@ -1,3 +1,7 @@
-{"id:1,
-"employee:{"name:"John,
-"age:34}}
+{
+	"id" : 1,
+	"employee" : {
+		"name" : "John",
+		"age" : 34
+	}
+}

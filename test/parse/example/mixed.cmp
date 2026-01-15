@@ -1,11 +1,16 @@
-id - 34.00
-employee - {name - "John"
-age - 34.00
-}
-children - ["Mike", "John", "Nick", ]
-random - {1 - [1.00, "hello", 34.40, "c", ]
-2 - {2.1 - 34.00
-2.2 - "gg"
-}
-3 - 34.40
+{
+	"id" : 34,
+	"employee" : {
+		"name" : "John",
+		"age" : 34
+	},
+	"children" : ["Mike", "John", "Nick"],
+	"random" : {
+		"1" : [1, "hello", 34.4, "c"],
+		"2" : {
+			"2.1" : 34,
+			"2.2" : "gg"
+		},
+		"3" : 34.4
+	}
 }
