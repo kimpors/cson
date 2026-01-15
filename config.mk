@@ -42,4 +42,4 @@ $(BUILD)/compile_commands.json: $(BUILD)
 compile: $(BUILD)/compile_commands.json
 
 clean:
-	@rm -rf $(BUILD)
+	-@rm -rf $(BUILD)
